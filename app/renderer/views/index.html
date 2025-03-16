@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self';">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Haushaltsbuch</title>
+  <link rel= "stylesheet" href= "style.css">
+</head>
+    <body>
+        <div class="left">
+            <div class="income-box">
+                <div class="box-header">
+                    <h4>Einnahmen</h4>
+                    <div id="add-income">+</div>
+                </div>
+                <table id="income-table">
+                    <tbody id="income-list"></tbody>
+                </table>
+            </div>
+            <div class="expenses-box">
+                <div class="box-header">
+                    <h4>Ausgaben</h4>
+                    <div id="add-expenses">+</div>
+                </div>
+                <table id="expenses-table">
+                    <tbody id="expenses-list"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="center">Center</div>
+        <div class="right">Right</div>
+
+        <div id="transaction-modal" class="hidden">
+            <div class="modal-content">
+                <h4 id="modal-header"></h4>
+
+                <div class="form-group">
+                    <input type="date" id="date" placeholder="Datum" autocomplete="off">
+                    <label for="date">Datum</label>
+                </div>
+
+                <div class="form-group combobox">
+                    <input type="text" id="description" placeholder="Kategorie" autocomplete="off">
+                    <label for="description">Kategorie</label>
+                    <ul class="dropdown-list" id="dropdown"></ul>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" id="amount" placeholder="Betrag" autocomplete="off">
+                    <label for="amount">Betrag</label>
+                </div>
+              
+                <div class="btn-container">
+                    <button id="close-modal">Schließen</button>
+                    <button id="save-transaction">Speichern</button>
+                </div>
+            </div>
+        </div>
+
+        <script src="../scripts/renderer.js"></script>
+    </body>
+</html>
