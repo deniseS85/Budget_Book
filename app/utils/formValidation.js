@@ -6,7 +6,6 @@ function validateForm() {
     saveButton.disabled = !(date && description && !isNaN(amount));
 }
 
-
 // nur ein komma oder punkt, nur 2 nachkommastellen
 function validateAmountInput(event) {
     const key = event.key;

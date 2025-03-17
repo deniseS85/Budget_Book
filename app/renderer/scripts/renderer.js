@@ -1,8 +1,8 @@
 const { ipcRenderer } = require('electron');
 const Income = require('../../models/Income');
 const Expense = require('../../models/Expense'); 
-const { openTransactionModal, toggleModal, clearForm } = require('../../utils/newTransactionModal');
-const { addTransaction, insertTransaction, sortTransactionsByDate, renderIncomeList, renderExpenseList } = require('../../utils/transactionHandler');
+const TransactionModal = require('../../utils/TransactionModal');
+const { sortTransactionsByDate, renderIncomeList, renderExpenseList } = require('../../utils/transactionHandler');
 
 window.onload = () => { ipcRenderer.send('load-data'); };
 
@@ -21,43 +21,22 @@ ipcRenderer.on('load-data-response', (event, data) => {
 });
 
 const transactionModal = document.getElementById('transaction-modal');
+const saveButton = document.getElementById('save-transaction');
 const modalHeader = document.getElementById('modal-header');
 const addIncomeButton = document.getElementById('add-income');
 const addExpensesButton = document.getElementById('add-expenses');
 const closeModalButton = document.getElementById('close-modal');
-const saveButton = document.getElementById('save-transaction');
 
-let transactionType = '';
-
-addIncomeButton.addEventListener('click', () => openTransactionModal('income', modalHeader, saveButton));
-addExpensesButton.addEventListener('click', () => openTransactionModal('expense', modalHeader, saveButton));
-closeModalButton.addEventListener('click', () => toggleModal(false, transactionModal, clearForm));
-transactionModal.addEventListener('click', (event) => event.target === transactionModal && toggleModal(false, transactionModal, clearForm));
-
-saveButton.addEventListener('click', async () => {
-    const date = document.getElementById('date').value;
-    const description = document.getElementById('description').value;
-    const amount = parseFloat(document.getElementById('amount').value);
+const transactionModalInstance = new TransactionModal(
+    transactionModal,
+    saveButton,
+    modalHeader,
+    addIncomeButton,
+    addExpensesButton,
+    closeModalButton
     
-    try {
-        const newTransactionData = await addTransaction(transactionType, { date, description, amount });
+);
 
-        if (transactionType === 'income') {
-            const newIncome = new Income(newTransactionData.date, newTransactionData.description, newTransactionData.amount);
-            insertTransaction(incomeList, newIncome, renderIncomeList);
-           /*  renderIncomeList(incomeList); */
-        } else if (transactionType === 'expense') {
-            const newExpense = new Expense(newTransactionData.date, newTransactionData.description, newTransactionData.amount);
-            insertTransaction(expenseList, newExpense, renderExpenseList);
-            /* renderExpenseList(expenseList); */
-        }
-
-        clearForm();
-        toggleModal(false, transactionModal, clearForm);
-    } catch (error) {
-        console.error('Error adding transaction:', error);
-    }
-    
-});
-
-
+addIncomeButton.addEventListener('click', () => transactionModalInstance.openTransactionModal('income'));
+addExpensesButton.addEventListener('click', () => transactionModalInstance.openTransactionModal('expense'));
+closeModalButton.addEventListener('click', () => transactionModalInstance.toggleModal(false));

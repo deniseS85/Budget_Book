@@ -235,25 +235,34 @@ input:focus {
     padding: 5px;
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
+    font-size: 14px;
     z-index: 1;
-  }
+}
+
   
-  .calendar div {
+.dayOfWeek, .day {
     text-align: center;
-    padding: 5px;
+    padding: 5px; 
+}
+
+.dayOfWeek {
+    font-weight: bold;
+    cursor: default;
+}
+
+.day {
     cursor: pointer;
     transition: background-color 0.3s ease; 
     border-radius: 50%;
-  }
+}
   
-  .calendar div:hover {
+.day:hover {
     background: var(--turquise);
-  }
+}
   
-  .hidden {
+.hidden {
     display: none;
-  }
+}
 
 
 
