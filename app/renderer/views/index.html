@@ -36,11 +36,12 @@
             <div class="modal-content">
                 <h4 id="modal-header"></h4>
 
-                <div class="form-group">
-                    <input type="date" id="date" placeholder="Datum" autocomplete="off">
+                <div class="form-group relative">
+                    <input type="text" id="date" placeholder="Datum" autocomplete="off" readonly>
                     <label for="date">Datum</label>
+                    <div id="calendar" class="calendar hidden"></div>
                 </div>
-
+                
                 <div class="form-group combobox">
                     <input type="text" id="description" placeholder="Kategorie" autocomplete="off">
                     <label for="description">Kategorie</label>
