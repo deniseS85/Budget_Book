@@ -220,6 +220,7 @@ input:focus {
     padding-top: 11px;
     padding-bottom: 8px;
     color-scheme: dark;
+    cursor: default;
 }
 
 .relative {
@@ -237,6 +238,48 @@ input:focus {
     grid-template-columns: repeat(7, 1fr);
     font-size: 14px;
     z-index: 1;
+}
+
+.calendar-header {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    padding: 8px;
+    font-weight: bold;
+    grid-column: span 7;
+}
+
+.prev-btn, .next-btn {
+    position: absolute;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 5px;
+    height: 20px;
+    transition: background-color 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    width: 35px;
+}
+
+.prev-btn:hover, .next-btn:hover {
+    background-color: var(--purple);
+}
+
+.prev-btn {
+    left: 0;
+}
+
+.next-btn {
+    right: 0;
+}
+
+.month-name {
+    flex-grow: 1;
+    text-align: center;
 }
 
   

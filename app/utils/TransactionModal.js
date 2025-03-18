@@ -21,6 +21,7 @@ class TransactionModal {
         this.addExpensesButton.addEventListener('click', () => this.openTransactionModal('expense'));
         this.closeModalButton.addEventListener('click', () => this.toggleModal(false));
         this.transactionModal.addEventListener('click', (event) => event.target === this.transactionModal && this.toggleModal(false));
+        this.transactionModal.addEventListener('click', (event) => this.calendar.isOpen && !event.target.closest('#date, #calendar') ? this.calendar.close() : null );
         this.saveButton.addEventListener('click', this.saveTransaction.bind(this));
     }
 
@@ -41,13 +42,10 @@ class TransactionModal {
             this.clearForm();
             this.calendar?.close(); 
         }
-    }
+    }    
 
     initializeDatePicker() {
         const today = new Date();
-      /*   const dateInput = document.getElementById('date');
-        dateInput.value = today.toISOString().split('T')[0]; */
-
         const dateInput = document.getElementById('date');
 
         dateInput.value = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
@@ -58,6 +56,7 @@ class TransactionModal {
             this.dateInputClickListener = () => this.calendar.toggle();
             dateInput.addEventListener('click', this.dateInputClickListener);
         }
+
     }
 
     attachEventListeners() {
