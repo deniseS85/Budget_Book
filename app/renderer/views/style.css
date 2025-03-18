@@ -281,7 +281,6 @@ input:focus {
     flex-grow: 1;
     text-align: center;
 }
-
   
 .dayOfWeek, .day {
     text-align: center;
@@ -307,19 +306,12 @@ input:focus {
     display: none;
 }
 
-
-
-
-
-
 .combobox {
     position: relative;
 }
 
 .dropdown-list {
     position: absolute;
-    top: 100%;
-    left: 0;
     width: 100%;
     background: var(--itemColor);
     border: 1px solid var(--turquise);
@@ -328,7 +320,6 @@ input:focus {
     overflow-y: auto;
     list-style: none;
     padding: 0;
-    margin: 4px 0 0;
     display: none;
     font-size: 13px;
 }
@@ -339,7 +330,7 @@ input:focus {
 }
 
 .dropdown-list li {
-    padding: 8px;
+    padding: 8px var(--pad);
     cursor: pointer;
 }
 

@@ -1,5 +1,6 @@
 const { validateForm, validateAmountInput } = require('./formValidation');
-const { Calendar } = require('./calendar');
+const { Calendar } = require('./Calendar');
+const { CategoryDropdown } = require('./CategoryDropdown');
 const { addTransaction, insertTransaction, renderIncomeList, renderExpenseList } = require('./transactionHandler');
 
 
@@ -13,6 +14,7 @@ class TransactionModal {
         this.closeModalButton = closeModalButton;
         this.transactionType = '';
         this.calendar = null;
+        this.categoryDropdown = null;
         this.init();
     }
 
@@ -21,7 +23,8 @@ class TransactionModal {
         this.addExpensesButton.addEventListener('click', () => this.openTransactionModal('expense'));
         this.closeModalButton.addEventListener('click', () => this.toggleModal(false));
         this.transactionModal.addEventListener('click', (event) => event.target === this.transactionModal && this.toggleModal(false));
-        this.transactionModal.addEventListener('click', (event) => this.calendar.isOpen && !event.target.closest('#date, #calendar') ? this.calendar.close() : null );
+        this.transactionModal.addEventListener('click', (event) => this.calendar.isOpen && !event.target.closest('#date, #calendar') ? this.calendar.closeCalendar() : null );
+        this.transactionModal.addEventListener('click', (event) => this.categoryDropdown.isOpen && !event.target.closest('#description, #dropdown') ? this.categoryDropdown.closeDropdown() : null);
         this.saveButton.addEventListener('click', this.saveTransaction.bind(this));
     }
 
@@ -30,7 +33,8 @@ class TransactionModal {
         this.modalHeader.innerHTML = this.transactionType === 'income' ? 'Neue Einnahme' : 'Neue Ausgabe';
         this.toggleModal(true);
         this.saveButton.disabled = true;
-        this.initializeDatePicker();
+        this.openDatePicker();
+        this.openCategoryDropdown();
         this.attachEventListeners();
     }
 
@@ -40,11 +44,11 @@ class TransactionModal {
 
         if (!isVisible) {
             this.clearForm();
-            this.calendar?.close(); 
+            this.calendar?.closeCalendar(); 
         }
     }    
 
-    initializeDatePicker() {
+    openDatePicker() {
         const today = new Date();
         const dateInput = document.getElementById('date');
 
@@ -53,10 +57,15 @@ class TransactionModal {
         this.calendar = new Calendar(document.getElementById('calendar'), dateInput);
     
         if (!this.dateInputClickListener) {
-            this.dateInputClickListener = () => this.calendar.toggle();
+            this.dateInputClickListener = () => this.calendar.toggleCalendar();
             dateInput.addEventListener('click', this.dateInputClickListener);
         }
+    }
 
+    openCategoryDropdown() {
+        const descriptionInput = document.getElementById('description');
+        const dropdownList = document.getElementById('dropdown');
+        this.categoryDropdown = new CategoryDropdown(descriptionInput, dropdownList);
     }
 
     attachEventListeners() {

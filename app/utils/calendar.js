@@ -1,36 +1,36 @@
 class Calendar {
-    constructor(container, dateInput) {
-        this.container = container;
+    constructor(calender, dateInput) {
+        this.calender = calender;
         this.dateInput = dateInput;
         this.isOpen = false;
     }
 
-    toggle() {
-        this.isOpen ? this.close() : this.open();
+    toggleCalendar() {
+        this.isOpen ? this.closeCalendar() : this.openCalendar();
     }
 
-    open() {
-        this.container.innerHTML = '';
+    openCalendar() {
+        this.calender.innerHTML = '';
         this.generateCalendar(new Date());
-        this.container.classList.remove('hidden');
+        this.calender.classList.remove('hidden');
         this.isOpen = true;
     }
 
-    close() {
-        this.container.classList.add('hidden');
+    closeCalendar() {
+        this.calender.classList.add('hidden');
         this.isOpen = false;
     }
 
     generateCalendar(date) {
-        this.container.innerHTML = '';
+        this.calender.innerHTML = '';
 
         const year = date.getFullYear();
         const month = date.getMonth();
         const firstDay = new Date(year, month, 1).getDay();
         const lastDate = new Date(year, month + 1, 0).getDate();
         
-        this.container.appendChild(this.createHeader(year, month));
-        this.container.appendChild(this.createDaysOfWeek());
+        this.calender.appendChild(this.createHeader(year, month));
+        this.calender.appendChild(this.createDaysOfWeek());
         this.createDays(firstDay, lastDate, year, month);
     }
 
@@ -81,7 +81,7 @@ class Calendar {
         Array.from({ length: startOffset }).forEach(() => {
             const emptyCell = document.createElement('div');
             emptyCell.style.visibility = 'hidden';
-            this.container.appendChild(emptyCell);
+            this.calender.appendChild(emptyCell);
         });
     
         Array.from({ length: lastDate }).forEach((_, day) => {
@@ -90,9 +90,9 @@ class Calendar {
             dayElement.textContent = day + 1;
             dayElement.addEventListener('click', () => {
                 this.dateInput.value = `${String(day + 1).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}`;
-                this.close();
+                this.closeCalendar();
             });
-            this.container.appendChild(dayElement);
+            this.calender.appendChild(dayElement);
         });
     }
 }
