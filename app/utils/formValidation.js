@@ -6,16 +6,30 @@ function validateForm() {
     saveButton.disabled = !(date && category && !isNaN(amount));
 }
 
-// nur ein komma oder punkt, nur 2 nachkommastellen
 function validateAmountInput(event) {
     const key = event.key;
-    const allowedKeys = [
-        'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '.', ',', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-    ];
+    const inputValue = event.target.value;
+    const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ','];
 
     if (!allowedKeys.includes(key)) {
         event.preventDefault();
+        return;
     }
+
+    if ((key === ',' || key === '.') && (inputValue.includes(',') || inputValue.includes('.'))) {
+        event.preventDefault();
+        return;
+    }
+
+    const decimalPart = inputValue.split(',')[1] || inputValue.split('.')[1];
+
+    if (decimalPart && decimalPart.length >= 2) {
+        const isControlKey = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(key);
+        if (!isControlKey) {
+            event.preventDefault();
+        }
+    }
+    
 }
 
 module.exports = { validateForm, validateAmountInput };
