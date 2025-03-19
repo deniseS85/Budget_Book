@@ -1,10 +1,10 @@
 const { ipcRenderer } = require('electron');
 const { renderIncomeList, renderExpenseList } = require('../utils/renderHTML');
 
-function addTransaction(transactionType, { date, description, amount }) {
-    console.log('Transaktion wird hinzugefügt:', { date, description, amount }); // Debugging
+function addTransaction(transactionType, { date, category, amount }) {
+    console.log('Transaktion wird hinzugefügt:', { date, category, amount }); // Debugging
     const channel = transactionType === 'income' ? 'add-income' : 'add-expense';
-    return ipcRenderer.invoke(channel, { date, description, amount });
+    return ipcRenderer.invoke(channel, { date, category, amount });
 }
 
 function insertTransaction(list, transaction, renderFunction) {

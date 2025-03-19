@@ -8,7 +8,7 @@ function renderList(type, list, append = false) {
         const row = document.createElement('tr');
         row.innerHTML = /*html*/`
             <td>${item.formatDate()}</td>
-            <td>${item.description}</td>
+            <td>${item.category}</td>
             <td>${item.formatAmount()}</td>`;
         tableBody.appendChild(row);
     });

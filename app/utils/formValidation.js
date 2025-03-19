@@ -1,9 +1,9 @@
 function validateForm() {
     const date = document.getElementById('date').value;
-    const description = document.getElementById('description').value;
+    const category = document.getElementById('category').value;
     const amount = parseFloat(document.getElementById('amount').value);
 
-    saveButton.disabled = !(date && description && !isNaN(amount));
+    saveButton.disabled = !(date && category && !isNaN(amount));
 }
 
 // nur ein komma oder punkt, nur 2 nachkommastellen

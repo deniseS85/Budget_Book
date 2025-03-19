@@ -5,7 +5,7 @@ const { addTransaction, insertTransaction, renderIncomeList, renderExpenseList }
 
 
 class TransactionModal {
-    constructor(transactionModal, saveButton, modalHeader, addIncomeButton, addExpensesButton, closeModalButton) {
+    constructor(transactionModal, saveButton, modalHeader, addIncomeButton, addExpensesButton, closeModalButton, categories = []) {
         this.transactionModal = transactionModal;
         this.saveButton = saveButton;
         this.modalHeader = modalHeader;
@@ -13,6 +13,7 @@ class TransactionModal {
         this.addExpensesButton = addExpensesButton;
         this.closeModalButton = closeModalButton;
         this.transactionType = '';
+        this.categories = categories; 
         this.calendar = null;
         this.categoryDropdown = null;
         this.init();
@@ -24,7 +25,7 @@ class TransactionModal {
         this.closeModalButton.addEventListener('click', () => this.toggleModal(false));
         this.transactionModal.addEventListener('click', (event) => event.target === this.transactionModal && this.toggleModal(false));
         this.transactionModal.addEventListener('click', (event) => this.calendar.isOpen && !event.target.closest('#date, #calendar') ? this.calendar.closeCalendar() : null );
-        this.transactionModal.addEventListener('click', (event) => this.categoryDropdown.isOpen && !event.target.closest('#description, #dropdown') ? this.categoryDropdown.closeDropdown() : null);
+        this.transactionModal.addEventListener('click', (event) => this.categoryDropdown.isOpen && !event.target.closest('#category, #dropdown') ? this.categoryDropdown.closeDropdown() : null);
         this.saveButton.addEventListener('click', this.saveTransaction.bind(this));
     }
 
@@ -62,43 +63,52 @@ class TransactionModal {
         }
     }
 
+    updateCategoriesData(categories) {
+        this.categories = categories;
+    }
+
     openCategoryDropdown() {
-        const descriptionInput = document.getElementById('description');
+        const categoryInput = document.getElementById('category');
         const dropdownList = document.getElementById('dropdown');
-        this.categoryDropdown = new CategoryDropdown(descriptionInput, dropdownList);
+        this.categoryDropdown = new CategoryDropdown(categoryInput, dropdownList, this.categories);
     }
 
     attachEventListeners() {
         document.getElementById('date').addEventListener('input', validateForm);
-        document.getElementById('description').addEventListener('input', validateForm);
+        document.getElementById('category').addEventListener('input', validateForm);
         document.getElementById('amount').addEventListener('input', validateForm);
         document.getElementById('amount').addEventListener('keydown', validateAmountInput);
     }
 
     clearForm() {
         document.getElementById('date').value = '';
-        document.getElementById('description').value = '';
+        document.getElementById('category').value = '';
         document.getElementById('amount').value = '';
     }
 
     async saveTransaction() {
         const date = document.getElementById('date').value.split('.');
         const formattedDate = `${date[2]}-${date[1]}-${date[0]}`;
-        const description = document.getElementById('description').value;
+        const category = document.getElementById('category').value;
         const amount = parseFloat(document.getElementById('amount').value);
         
         try {
-            const newTransactionData = await addTransaction(this.transactionType, { date: formattedDate, description, amount });
+            const newTransactionData = await addTransaction(this.transactionType, { date: formattedDate, category, amount });
+
+            if (!this.categories.includes(newTransactionData.category)) {
+                this.updateCategoriesData([...this.categories, newTransactionData.category]);
+            }
 
             if (this.transactionType === 'income') {
-                const newIncome = new Income(newTransactionData.date, newTransactionData.description, newTransactionData.amount);
+                const newIncome = new Income(newTransactionData.date, newTransactionData.category, newTransactionData.amount);
                 insertTransaction(incomeList, newIncome, renderIncomeList);
             } else if (this.transactionType === 'expense') {
-                const newExpense = new Expense(newTransactionData.date, newTransactionData.description, newTransactionData.amount);
+                const newExpense = new Expense(newTransactionData.date, newTransactionData.category, newTransactionData.amount);
                 insertTransaction(expenseList, newExpense, renderExpenseList);
             }
             this.clearForm();
             this.toggleModal(false);
+            this.categoryDropdown.setDropdownList();
         } catch (error) {
             console.error('Error adding transaction:', error);
         } 

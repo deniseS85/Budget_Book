@@ -1,9 +1,8 @@
 const Transaction = require('./Transaction');
 
 class Income extends Transaction {
-    
-    constructor(date, description, amount) {
-        super(date, description, amount);
+    constructor(date, category, amount) {
+        super(date, category, amount);
         this.type = "income";
     }
 }

@@ -10,14 +10,19 @@ let incomeList = [];
 let expenseList = [];
 
 ipcRenderer.on('load-data-response', (event, data) => {
-    incomeList = data.income.map(item => new Income(item.date, item.description, item.amount));
-    expenseList = data.expenses.map(item => new Expense(item.date, item.description, item.amount));
+    incomeList = data.income.map(item => new Income(item.date, item.category, item.amount));
+    expenseList = data.expenses.map(item => new Expense(item.date, item.category, item.amount));
 
     incomeList = sortTransactionsByDate(incomeList);
     expenseList = sortTransactionsByDate(expenseList);
 
     renderIncomeList(incomeList);
     renderExpenseList(expenseList);
+
+    const incomeCategories = incomeList.map(item => item.category);
+    const expensesCategories = expenseList.map(item => item.category);
+    const allCategories = [...new Set([...incomeCategories, ...expensesCategories])];
+    transactionModalInstance.updateCategoriesData(allCategories); 
 });
 
 const transactionModal = document.getElementById('transaction-modal');
@@ -33,8 +38,7 @@ const transactionModalInstance = new TransactionModal(
     modalHeader,
     addIncomeButton,
     addExpensesButton,
-    closeModalButton
-    
+    closeModalButton,
 );
 
 addIncomeButton.addEventListener('click', () => transactionModalInstance.openTransactionModal('income'));

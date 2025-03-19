@@ -1,8 +1,7 @@
 class Transaction {
-
-    constructor(date, description, amount) {
+    constructor(date, category, amount) {
         this.date = new Date(date);
-        this.description = description;
+        this.category = category;
         this.amount = parseFloat(amount);
     }
 
