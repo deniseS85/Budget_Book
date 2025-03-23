@@ -7,8 +7,6 @@
     --turquise: #57b2be;
 }
 
-<<<<<<< HEAD
-=======
 @font-face {
     font-family: 'Poppins';
     src: url('../../assets/fonts/Poppins/Poppins-Regular.ttf');
@@ -21,7 +19,6 @@
     font-weight: 700;
 }
 
->>>>>>> show today in calender, add fonts
 ::-webkit-scrollbar {
     width: 3px;
 }
@@ -66,12 +63,8 @@ body {
 .left {
     display: flex;
     flex-direction: column;
-<<<<<<< HEAD
-    flex-grow: 1;
-=======
     flex-grow: 0;
     flex-basis: 250px;
->>>>>>> show today in calender, add fonts
     gap: 10px;
 }
 
@@ -84,8 +77,6 @@ body {
     align-items: center;
     color: var(--subFontColor);
     overflow: auto;
-<<<<<<< HEAD
-=======
     transition: box-shadow 0.2s ease;
 }
 
@@ -95,7 +86,6 @@ body {
 
 .expenses-box:hover {
     box-shadow: 0 0 0 2px var(--purple); 
->>>>>>> show today in calender, add fonts
 }
 
 .box-header {
@@ -333,15 +323,12 @@ input:focus {
 .day:hover {
     background: var(--turquise);
 }
-<<<<<<< HEAD
-=======
 
 .today {
     border-radius: 50%;
     font-weight: bold;
     background-color: var(--purple);
 }
->>>>>>> show today in calender, add fonts
   
 .hidden {
     display: none;
@@ -379,8 +366,6 @@ input:focus {
     background: var(--turquise);
     color: var(--bg);
 }
-
-
 
 .btn-container {
     width: 100%;
