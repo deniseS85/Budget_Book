@@ -1,9 +1,8 @@
 const { validateForm, validateAmountInput } = require('./formValidation');
 const { Calendar } = require('./Calendar');
 const { CategoryDropdown } = require('./CategoryDropdown');
-const { addTransaction, insertTransaction, renderIncomeList, renderExpenseList } = require('./transactionHandler');
-
-
+const { addTransaction, insertTransaction } = require('./transactionHandler');
+const { renderIncomeList, renderExpenseList } = require('../utils/renderHTML_MainView');
 class TransactionModal {
     constructor(transactionModal, saveButton, modalHeader, addIncomeButton, addExpensesButton, closeModalButton, categories = []) {
         this.transactionModal = transactionModal;
@@ -23,9 +22,15 @@ class TransactionModal {
         this.addIncomeButton.addEventListener('click', () => this.openTransactionModal('income'));
         this.addExpensesButton.addEventListener('click', () => this.openTransactionModal('expense'));
         this.closeModalButton.addEventListener('click', () => this.toggleModal(false));
-        this.transactionModal.addEventListener('click', (event) => event.target === this.transactionModal && this.toggleModal(false));
-        this.transactionModal.addEventListener('click', (event) => this.calendar.isOpen && !event.target.closest('#date, #calendar') ? this.calendar.closeCalendar() : null );
-        this.transactionModal.addEventListener('click', (event) => this.categoryDropdown.isOpen && !event.target.closest('#category, #dropdown') ? this.categoryDropdown.closeDropdown() : null);
+       this.transactionModal.addEventListener('click', (event) => {
+        if (event.target === this.transactionModal) {
+            this.toggleModal(false);
+        } else if (this.calendar?.isOpen && !event.target.closest('#date, #calendar')) {
+            this.calendar.closeCalendar();
+        } else if (this.categoryDropdown?.isOpen && !event.target.closest('#category, #dropdown')) {
+            this.categoryDropdown.closeDropdown();
+        }
+    });
         this.saveButton.addEventListener('click', this.saveTransaction.bind(this));
     }
 

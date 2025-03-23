@@ -10,15 +10,10 @@ require('./controllers/ExpenseController');
 function createWindow() {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
-    const windowWidth = 600; 
-    const windowHeight = 900;
-    const xPos = width - windowWidth;  
-
     let win = new BrowserWindow({
-        width: windowWidth, /* 1200 */
-        height: windowHeight, /* 800 */
-        x: xPos,
-        y: 0,
+        width: width,
+        height: height,
+    
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,

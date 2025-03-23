@@ -9,25 +9,59 @@
 </head>
     <body>
         <div class="left">
-            <div class="income-box">
+            <div class="period-slider">
+                <input type="checkbox" id="toggle" class="toggleCheckbox">
+                <label for="toggle" class='toggleContainer'>
+                    <div>Monat</div>   
+                    <div>Jahr</div>
+                </label>
+            </div>
+
+            <div class="income-box" id="income-box">
                 <div class="box-header">
                     <h4>Einnahmen</h4>
-                    <div id="add-income">+</div>
+                    <div id="income-current-period" class="current-period"></div>
+                   <!--  <div id="add-income">+</div> -->
                 </div>
+
                 <table id="income-table">
                     <tbody id="income-list"></tbody>
                 </table>
             </div>
-            <div class="expenses-box">
+            <div class="expenses-box" id="expenses-box">
                 <div class="box-header">
                     <h4>Ausgaben</h4>
-                    <div id="add-expenses">+</div>
+                    <div id="expenses-current-period" class="current-period"></div>
+                    <!-- <div id="add-expenses">+</div> -->
                 </div>
                 <table id="expenses-table">
                     <tbody id="expenses-list"></tbody>
                 </table>
             </div>
         </div>
+
+
+
+        <div id="detail-window" class="detail-window">
+            <div class="detail-view-header">
+                <div id="close-details">←</div>
+                <div id="add-income">+</div>
+                <div id="add-expenses">+</div>
+            </div>
+            
+        </div>
+
+        <!-- <div class="detail-window">
+            <div class="detail-view-header">
+                <div id="close-details">←</div>
+                <h4></h4>
+                <div id="add">+</div> 
+            </div>
+
+            <div class="detail-view"></div> 
+        </div> -->
+
+        
 
         <div class="center">Center</div>
         <div class="right">Right</div>

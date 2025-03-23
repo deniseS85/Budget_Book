@@ -31,7 +31,7 @@ class CategoryDropdown {
     renderCategories(categories) {
         this.dropdownElement.innerHTML = '';
 
-        if (categories.length === 0) {
+        if (categories.length === 0 && this.inputElement.value.trim().length === 0) {
             this.dropdownElement.innerHTML = '<li>Keine Kategorien verfügbar</li>';
             return;
         }

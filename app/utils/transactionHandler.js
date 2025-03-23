@@ -1,8 +1,17 @@
 const { ipcRenderer } = require('electron');
-const { renderIncomeList, renderExpenseList } = require('../utils/renderHTML');
 
 function addTransaction(transactionType, { date, category, amount }) {
-    const channel = transactionType === 'income' ? 'add-income' : 'add-expense';
+    const channels = {
+        income: 'add-income',
+        expense: 'add-expense'
+    };
+
+    const channel = channels[transactionType];
+    
+    if (!channel) {
+        throw new Error(`Invalid transaction type: ${transactionType}`);
+    }
+
     return ipcRenderer.invoke(channel, { date, category, amount });
 }
 
@@ -15,9 +24,7 @@ function insertTransaction(list, transaction, renderFunction) {
         list.splice(insertIndex, 0, transaction);
     }
 
-    list = sortTransactionsByDate(list);
-
-    renderFunction(list);
+    renderFunction(sortTransactionsByDate(list));
 }
 
 function sortTransactionsByDate(list) {
@@ -27,7 +34,5 @@ function sortTransactionsByDate(list) {
 module.exports = {
     addTransaction,
     insertTransaction,
-    sortTransactionsByDate,
-    renderIncomeList,
-    renderExpenseList
+    sortTransactionsByDate
 };
