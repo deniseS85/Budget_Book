@@ -94,7 +94,11 @@ class TransactionModal {
         
         try {
             const newTransactionData = await addTransaction(this.transactionType, { date: formattedDate, category, amount });
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> show today in calender, add fonts
             if (!this.categories.includes(newTransactionData.category)) {
                 this.updateCategoriesData([...this.categories, newTransactionData.category]);
             }
