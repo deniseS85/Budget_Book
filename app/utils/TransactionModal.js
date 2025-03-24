@@ -3,6 +3,8 @@ const { Calendar } = require('./Calendar');
 const { CategoryDropdown } = require('./CategoryDropdown');
 const { addTransaction, insertTransaction } = require('./transactionHandler');
 const { renderIncomeList, renderExpenseList, updateTransactionView } = require('../utils/renderHTML_MainView');
+const Income = require('../models/Income');
+const Expense = require('../models/Expense');
 class TransactionModal {
     constructor(transactionModal, saveButton, modalHeader, closeModalButton, categories = []) {
         this.transactionModal = transactionModal;
@@ -89,34 +91,64 @@ class TransactionModal {
     }
 
     async saveTransaction() {
+        const { formattedDate, category, amount, isYearly } = this.getTransactionData();
+
+        try {
+            if (!this.transactionType) return console.error("Transaction type is missing!");
+
+            const newTransactionData = await addTransaction(this.transactionType, { date: formattedDate, category, amount });
+            
+            const newTransaction = this.transactionType === 'income'
+                ? new Income(newTransactionData.date, newTransactionData.category, newTransactionData.amount)
+                : new Expense(newTransactionData.date, newTransactionData.category, newTransactionData.amount);
+
+            this.updateCategories(newTransactionData.category);
+            this.addTransactionToList(this.transactionType, newTransactionData);
+            updateTransactionView(isYearly);
+            this.clearForm();
+            this.toggleModal(false);
+            this.categoryDropdown.setDropdownList();
+
+    
+            this.dispatchTransactionSavedEvent(newTransaction);
+
+        } catch (error) {
+            console.error('Error adding transaction:', error);
+        } 
+    }
+
+    getTransactionData() {
         const date = document.getElementById('date').value.split('.');
         const formattedDate = `${date[2]}-${date[1]}-${date[0]}`;
         const category = document.getElementById('category').value;
         const amount = parseFloat(document.getElementById('amount').value);
-        
-        try {
-            const newTransactionData = await addTransaction(this.transactionType, { date: formattedDate, category, amount });
-            if (!this.categories.includes(newTransactionData.category)) {
-                this.updateCategoriesData([...this.categories, newTransactionData.category]);
-            }
+        const isYearly = document.getElementById('toggle').checked;
+    
+        return { formattedDate, category, amount, isYearly };
+    }
 
-            if (this.transactionType === 'income') {
-                const newIncome = new Income(newTransactionData.date, newTransactionData.category, newTransactionData.amount);
-                insertTransaction(incomeList, newIncome, renderIncomeList);
-            } else if (this.transactionType === 'expense') {
-                const newExpense = new Expense(newTransactionData.date, newTransactionData.category, newTransactionData.amount);
-                insertTransaction(expenseList, newExpense, renderExpenseList);
-            }
+    updateCategories(newCategory) {
+        if (!this.categories.includes(newCategory)) {
+            this.updateCategoriesData([...this.categories, newCategory]);
+        }
+    }
 
-            const isYearly = document.getElementById('toggle').checked;
-            updateTransactionView(isYearly);
+    addTransactionToList(type, transactionData) {
+        if (type === 'income') {
+            const newIncome = new Income(transactionData.date, transactionData.category, transactionData.amount);
+            insertTransaction(incomeList, newIncome, renderIncomeList);
+        } else if (type === 'expense') {
+            const newExpense = new Expense(transactionData.date, transactionData.category, transactionData.amount);
+            insertTransaction(expenseList, newExpense, renderExpenseList);
+        }
+    }
 
-            this.clearForm();
-            this.toggleModal(false);
-            this.categoryDropdown.setDropdownList();
-        } catch (error) {
-            console.error('Error adding transaction:', error);
-        } 
+
+    dispatchTransactionSavedEvent(transaction) {
+        const event = new CustomEvent('transactionSaved', {
+            detail: transaction
+        });
+        document.dispatchEvent(event); 
     }
 }
 
