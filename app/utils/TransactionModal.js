@@ -1,15 +1,13 @@
-const { validateForm, validateAmountInput } = require('./formValidation');
+const { validateForm, validateAmountInput } = require('../utils/formValidation');
 const { Calendar } = require('./Calendar');
 const { CategoryDropdown } = require('./CategoryDropdown');
 const { addTransaction, insertTransaction } = require('./transactionHandler');
 const { renderIncomeList, renderExpenseList } = require('../utils/renderHTML_MainView');
 class TransactionModal {
-    constructor(transactionModal, saveButton, modalHeader, addIncomeButton, addExpensesButton, closeModalButton, categories = []) {
+    constructor(transactionModal, saveButton, modalHeader, closeModalButton, categories = []) {
         this.transactionModal = transactionModal;
         this.saveButton = saveButton;
         this.modalHeader = modalHeader;
-        this.addIncomeButton = addIncomeButton;
-        this.addExpensesButton = addExpensesButton;
         this.closeModalButton = closeModalButton;
         this.transactionType = '';
         this.categories = categories; 
@@ -19,18 +17,16 @@ class TransactionModal {
     }
 
     init() {
-        this.addIncomeButton.addEventListener('click', () => this.openTransactionModal('income'));
-        this.addExpensesButton.addEventListener('click', () => this.openTransactionModal('expense'));
         this.closeModalButton.addEventListener('click', () => this.toggleModal(false));
-       this.transactionModal.addEventListener('click', (event) => {
-        if (event.target === this.transactionModal) {
-            this.toggleModal(false);
-        } else if (this.calendar?.isOpen && !event.target.closest('#date, #calendar')) {
-            this.calendar.closeCalendar();
-        } else if (this.categoryDropdown?.isOpen && !event.target.closest('#category, #dropdown')) {
-            this.categoryDropdown.closeDropdown();
-        }
-    });
+        this.transactionModal.addEventListener('click', (event) => {
+            if (event.target === this.transactionModal) {
+                this.toggleModal(false);
+            } else if (this.calendar?.isOpen && !event.target.closest('#date, #calendar')) {
+                this.calendar.closeCalendar();
+            } else if (this.categoryDropdown?.isOpen && !event.target.closest('#category, #dropdown')) {
+                this.categoryDropdown.closeDropdown();
+            }
+        });
         this.saveButton.addEventListener('click', this.saveTransaction.bind(this));
     }
 
@@ -79,11 +75,12 @@ class TransactionModal {
     }
 
     attachEventListeners() {
-        document.getElementById('date').addEventListener('input', validateForm);
-        document.getElementById('category').addEventListener('input', validateForm);
-        document.getElementById('amount').addEventListener('input', validateForm);
+        document.getElementById('date').addEventListener('input', () => validateForm(this.saveButton));
+        document.getElementById('category').addEventListener('input', () => validateForm(this.saveButton));
+        document.getElementById('amount').addEventListener('input', () => validateForm(this.saveButton));
         document.getElementById('amount').addEventListener('keydown', validateAmountInput);
     }
+    
 
     clearForm() {
         document.getElementById('date').value = '';
