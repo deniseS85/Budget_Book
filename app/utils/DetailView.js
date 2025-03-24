@@ -7,11 +7,13 @@ class DetailView {
         this.detailHeadline = this.detailViewHeader.querySelector('h4');
         this.closeDetails = document.getElementById('close-details');
         this.transactionModal = transactionModal;
+        this.attachEventListeners();
+    }
 
+    attachEventListeners() {
         this.closeDetails.addEventListener('mouseover', this.handleMouseOver.bind(this));
         this.closeDetails.addEventListener('mouseout', this.handleMouseOut.bind(this));
         this.closeDetails.addEventListener('click', this.closeDetailView.bind(this));
-
         this.addIncomeBtn.addEventListener('click', () => this.transactionModal.openTransactionModal('income'));
         this.addExpensesBtn.addEventListener('click', () => this.transactionModal.openTransactionModal('expense'));
     }

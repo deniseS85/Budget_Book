@@ -2,7 +2,7 @@ const { validateForm, validateAmountInput } = require('../utils/formValidation')
 const { Calendar } = require('./Calendar');
 const { CategoryDropdown } = require('./CategoryDropdown');
 const { addTransaction, insertTransaction } = require('./transactionHandler');
-const { renderIncomeList, renderExpenseList } = require('../utils/renderHTML_MainView');
+const { renderIncomeList, renderExpenseList, updateTransactionView } = require('../utils/renderHTML_MainView');
 class TransactionModal {
     constructor(transactionModal, saveButton, modalHeader, closeModalButton, categories = []) {
         this.transactionModal = transactionModal;
@@ -13,10 +13,10 @@ class TransactionModal {
         this.categories = categories; 
         this.calendar = null;
         this.categoryDropdown = null;
-        this.init();
+        this.attachEventListeners();
     }
 
-    init() {
+    attachEventListeners() {
         this.closeModalButton.addEventListener('click', () => this.toggleModal(false));
         this.transactionModal.addEventListener('click', (event) => {
             if (event.target === this.transactionModal) {
@@ -37,7 +37,7 @@ class TransactionModal {
         this.saveButton.disabled = true;
         this.openDatePicker();
         this.openCategoryDropdown();
-        this.attachEventListeners();
+        this.checkValidation();
     }
 
     toggleModal(isVisible) {
@@ -74,7 +74,7 @@ class TransactionModal {
         this.categoryDropdown = new CategoryDropdown(categoryInput, dropdownList, this.categories);
     }
 
-    attachEventListeners() {
+    checkValidation() {
         document.getElementById('date').addEventListener('input', () => validateForm(this.saveButton));
         document.getElementById('category').addEventListener('input', () => validateForm(this.saveButton));
         document.getElementById('amount').addEventListener('input', () => validateForm(this.saveButton));
@@ -107,6 +107,10 @@ class TransactionModal {
                 const newExpense = new Expense(newTransactionData.date, newTransactionData.category, newTransactionData.amount);
                 insertTransaction(expenseList, newExpense, renderExpenseList);
             }
+
+            const isYearly = document.getElementById('toggle').checked;
+            updateTransactionView(isYearly);
+
             this.clearForm();
             this.toggleModal(false);
             this.categoryDropdown.setDropdownList();

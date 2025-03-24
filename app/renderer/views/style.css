@@ -365,6 +365,9 @@ td:last-child {
 }
 
 
+
+
+
 #transaction-modal {
     visibility: hidden;
     position: fixed;
@@ -459,7 +462,7 @@ td:last-child {
     padding-top: 11px;
     padding-bottom: 8px;
     color-scheme: dark;
-    cursor: default;
+    cursor: pointer;
 }
 
 .relative {
@@ -476,6 +479,12 @@ td:last-child {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+}
+
+.calendar.open {
+    opacity: 1;
     z-index: 1;
 }
 
@@ -561,17 +570,19 @@ td:last-child {
     background: var(--itemColor);
     border: 1px solid var(--turquise);
     border-radius: 8px;
-    max-height: 150px;
-    overflow-y: auto;
+    max-height: 0;
+    overflow-y: hidden;
+    visibility: hidden;
+    transition: max-height 0.3s ease-out, visibility 0.3s ease-out;
     list-style: none;
     padding: 0;
-    display: none;
     font-size: 13px;
+    z-index: 1;
 }
 
 .dropdown-list.open {
-    display: block;
-    z-index: 1;
+    visibility: visible;
+    max-height: 150px;
 }
 
 .dropdown-list li {

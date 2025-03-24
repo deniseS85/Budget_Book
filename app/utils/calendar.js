@@ -12,12 +12,12 @@ class Calendar {
     openCalendar() {
         this.calender.innerHTML = '';
         this.generateCalendar(new Date());
-        this.calender.classList.remove('hidden');
+        this.calender.classList.add('open');
         this.isOpen = true;
     }
 
     closeCalendar() {
-        this.calender.classList.add('hidden');
+        this.calender.classList.remove('open');
         this.isOpen = false;
     }
 
