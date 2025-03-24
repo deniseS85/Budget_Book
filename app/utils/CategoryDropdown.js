@@ -20,11 +20,20 @@ class CategoryDropdown {
 
     openDropdown() {
         this.dropdownElement.classList.add('open');
+        this.inputElement.classList.add('open-dropdown');
         this.isOpen = true;
     }
 
     closeDropdown() {
         this.dropdownElement.classList.remove('open');
+        this.inputElement.classList.remove('open-dropdown');
+
+        
+        this.inputElement.classList.add('close-dropdown');
+
+        setTimeout(() => {
+            this.inputElement.classList.remove('close-dropdown');
+        }, 300);
         this.isOpen = false;
     }
 
@@ -47,6 +56,7 @@ class CategoryDropdown {
         const searchTerm = this.inputElement.value.toLowerCase();
         const filteredCategories = this.categories.filter(category => category.toLowerCase().includes(searchTerm));
 
+       /*  searchTerm.length > 0 ? this.inputElement.style.borderColor =  */
         if (searchTerm.length === 0) {
             this.renderCategories(this.categories);
             return;
@@ -54,6 +64,7 @@ class CategoryDropdown {
     
         if (filteredCategories.length === 0) {
             this.renderCategories([]);
+            this.closeDropdown();
             return;
         }
 

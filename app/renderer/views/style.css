@@ -5,6 +5,10 @@
     --subFontColor: silver;
     --purple: #ab196c;
     --turquise: #57b2be;
+    --lila: #937be2;
+    --transaction-color: var(--turquise);
+    --transaction-font-color: var(--fontColor);
+    --transaction-hover-color: #00ffcc;
 }
 
 @font-face {
@@ -378,7 +382,7 @@ td:last-child {
 
 .modal-content {
     background: var(--itemColor);
-    border: 1px solid var(--fontColor);
+    border: 1px solid var(--transaction-color);
     padding: 20px;
     border-radius: 10px;
     font-size: 16px;
@@ -406,10 +410,22 @@ td:last-child {
     padding: var(--pad);
     border-radius: 8px;
     background-color: var(--itemColor);
-    border: 1px solid var(--fontColor);
+    border: 1px solid var(--transaction-color);
     width: 100%;
     outline: none;
     color: var(--fontColor);
+}
+
+#category.open-dropdown {
+    cursor: pointer;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+#category.close-dropdown {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    transition-delay: 0.3s; 
 }
 
 #transaction-modal label {
@@ -433,17 +449,17 @@ td:last-child {
 #transaction-modal input:focus + label,
 #transaction-modal input:not(:placeholder-shown) + label {
     transform: translateY(calc(-40% - var(--pad))) scale(.8);
-    color: var(--turquise);
+    color: var(--transaction-color);
     opacity: 1;
 }
 
 #transaction-modal input:focus {
-    border: 1px solid var(--turquise);
+    border: 1px solid var(--transaction-color);
 }
 
 #date {
     font-family: Poppins, sans-serif;
-    border: 1px solid var(--turquise);
+    border: 1px solid var(--transaction-color);
     padding-top: 11px;
     padding-bottom: 8px;
     color-scheme: dark;
@@ -458,7 +474,7 @@ td:last-child {
     position: absolute;
     left: 0;
     background: var(--itemColor);
-    border: 1px solid var(--turquise);
+    border: 1px solid var(--transaction-color);
     border-radius: 8px;
     padding: 5px;
     display: grid;
@@ -466,6 +482,7 @@ td:last-child {
     font-size: 14px;
     opacity: 0;
     transition: opacity 0.3s ease-out;
+    z-index: -1;
 }
 
 .calendar.open {
@@ -499,7 +516,7 @@ td:last-child {
 }
 
 .prev-btn:hover, .next-btn:hover {
-    background-color: var(--purple);
+    background-color: var(--transaction-color);
 }
 
 .prev-btn {
@@ -513,11 +530,13 @@ td:last-child {
 .month-name {
     flex-grow: 1;
     text-align: center;
+    font-weight: normal;
 }
   
 .dayOfWeek, .day {
     text-align: center;
-    padding: 5px; 
+    padding: 4px;
+    margin: 1px;
 }
 
 .dayOfWeek {
@@ -526,19 +545,24 @@ td:last-child {
 }
 
 .day {
-    cursor: pointer;
     transition: background-color 0.3s ease; 
     border-radius: 50%;
 }
   
-.day:hover {
-    background: var(--turquise);
+.day:not(.today):hover {
+    background: var(--bg);
 }
 
 .today {
     border-radius: 50%;
-    font-weight: bold;
-    background-color: var(--purple);
+    color: var(--transaction-font-color);
+    background-color: var(--transaction-color);
+    padding: 2.5px;
+    margin: 2.5px;
+}
+
+.today:hover {
+    background-color: var(--transaction-hover-color);
 }
   
 .hidden {
@@ -553,16 +577,20 @@ td:last-child {
     position: absolute;
     width: 100%;
     background: var(--itemColor);
-    border: 1px solid var(--turquise);
+    border: 1px solid var(--transaction-color);
     border-radius: 8px;
     max-height: 0;
     overflow-y: auto;
     visibility: hidden;
-    transition: max-height 0.3s ease-out, visibility 0.3s ease-out;
+    transition: max-height 0.3s ease-out, visibility 0.3s ease-out, border-radius 0.3s ease-out;
     list-style: none;
     padding: 0;
     font-size: 13px;
     z-index: 1;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    top: 40px;
+    border-top: transparent;
 }
 
 .dropdown-list.open {
@@ -576,8 +604,8 @@ td:last-child {
 }
 
 .dropdown-list li:hover {
-    background: var(--turquise);
-    color: var(--bg);
+    background: var(--transaction-color);
+    color: var(--transaction-font-color);
 }
 
 .btn-container {
@@ -589,10 +617,10 @@ td:last-child {
 #save-transaction, #close-modal {
     width: 140px;
     height: 35px;
-    background-color: var(--purple);
+    background-color: var(--transaction-color);
     border: none;
     border-radius: 10px;
-    color: var(--fontColor);
+    color: var(--transaction-font-color);
     transition: background-color 0.3s ease; 
     cursor: pointer;
 }
@@ -602,8 +630,8 @@ td:last-child {
     opacity: 0.7;
 }
 
-#save-transaction:not(:disabled):hover {
-    background-color: #ff0291;
+#save-transaction:not(:disabled):hover, #close-modal:hover {
+    background-color: var(--transaction-hover-color);
 }
 
 .center, .right {

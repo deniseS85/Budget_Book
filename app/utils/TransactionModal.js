@@ -16,6 +16,7 @@ class TransactionModal {
         this.calendar = null;
         this.categoryDropdown = null;
         this.attachEventListeners();
+        console.log(this.transactionModal);
     }
 
     attachEventListeners() {
@@ -35,12 +36,35 @@ class TransactionModal {
     openTransactionModal(type) {
         this.transactionType = type;
         this.modalHeader.innerHTML = this.transactionType === 'income' ? 'Neue Einnahme' : 'Neue Ausgabe';
+        this.setTransactionColors(this.transactionType);
         this.toggleModal(true);
         this.saveButton.disabled = true;
         this.openDatePicker();
         this.openCategoryDropdown();
         this.checkValidation();
     }
+
+    setTransactionColors(type) {
+        const colors = {
+            income: {
+                color: 'var(--turquise)',
+                fontColor: 'var(--itemColor)',
+                hoverColor: '#00ffcc'
+            },
+            expense: {
+                color: 'var(--purple)',
+                fontColor: 'var(--fontColor)',
+                hoverColor: '#fd0290'
+            }
+        };
+    
+        const selectedColors = colors[type];
+    
+        document.documentElement.style.setProperty('--transaction-color', selectedColors.color);
+        document.documentElement.style.setProperty('--transaction-font-color', selectedColors.fontColor);
+        document.documentElement.style.setProperty('--transaction-hover-color', selectedColors.hoverColor);
+    }
+    
 
     toggleModal(isVisible) {
         this.transactionModal.classList.toggle('visible', isVisible);
@@ -49,6 +73,7 @@ class TransactionModal {
         if (!isVisible) {
             this.clearForm();
             this.calendar?.closeCalendar(); 
+            this.categoryDropdown?.closeDropdown();
         }
     }    
 
@@ -76,14 +101,13 @@ class TransactionModal {
         this.categoryDropdown = new CategoryDropdown(categoryInput, dropdownList, this.categories);
     }
 
-    checkValidation() {
-        document.getElementById('date').addEventListener('input', () => validateForm(this.saveButton));
+    checkValidation() {  
+        document.getElementById('dropdown').addEventListener('click', () => validateForm(this.saveButton));
         document.getElementById('category').addEventListener('input', () => validateForm(this.saveButton));
         document.getElementById('amount').addEventListener('input', () => validateForm(this.saveButton));
         document.getElementById('amount').addEventListener('keydown', validateAmountInput);
     }
     
-
     clearForm() {
         document.getElementById('date').value = '';
         document.getElementById('category').value = '';

@@ -1,5 +1,3 @@
-const Transaction = require('../models/Transaction');
-
 class DetailView {
     constructor(transactionModal) {
         this.transactionWindow = document.getElementById('detail-window');

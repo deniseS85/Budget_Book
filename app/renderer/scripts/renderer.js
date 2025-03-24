@@ -29,7 +29,6 @@ ipcRenderer.on('load-data-response', (event, data) => {
     transactionModalInstance.updateCategoriesData(allCategories); 
 });
 
-
 document.getElementById('toggle').addEventListener('change', () => {
     updateTransactionView(document.getElementById('toggle').checked);
     setCurrentPeriod(); 
