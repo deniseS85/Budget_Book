@@ -14,17 +14,24 @@ function calculateAverage(list, isYearly) {
         const item = list[i];
         const category = item.category;
         const amount = item.amount;
+        
+        const monthYear = (typeof item.date === 'string' && item.date) 
+            ? item.date.slice(0, 7)
+            : item.date?.toISOString().slice(0, 7);
+
+        if (!monthYear) { continue; }
 
         categories[category] ??= 0;
-        monthsCount[category] ??= 0;
+        monthsCount[category] ??= new Set();
 
         categories[category] += amount;
-        monthsCount[category]++;
+        monthsCount[category].add(monthYear);
     }
 
     const result = Object.keys(categories).map(category => {
-        let monthlyAverage = categories[category] / monthsCount[category];
-        let yearlyAverage = monthlyAverage * 12;
+        const uniqueMonths = monthsCount[category].size;
+        const monthlyAverage = categories[category] / uniqueMonths;
+        const yearlyAverage = isYearly ? (uniqueMonths < 12 ? monthlyAverage * uniqueMonths : monthlyAverage * 12) : null;
 
         return {
             amount: isYearly ? yearlyAverage : monthlyAverage,
@@ -34,6 +41,7 @@ function calculateAverage(list, isYearly) {
 
     return result;
 }
+
 
 function groupByCategory(list) {
     return list.reduce((acc, item) => {
