@@ -4,12 +4,9 @@ const Expense = require('../../models/Expense');
 const TransactionModal = require('../../utils/TransactionModal');
 const  DetailView = require('../../utils/DetailView');
 const { sortTransactionsByDate } = require('../../utils/transactionHandler');
-const { updateTransactionView, setCurrentPeriod } = require('../../utils/renderHTML_MainView');
+const { updateTransactionView } = require('../../utils/renderHTML_MainView');
 
-window.onload = () => { 
-    ipcRenderer.send('load-data'); 
-    setCurrentPeriod();
-};
+window.onload = () => { ipcRenderer.send('load-data'); };
 
 let incomeList = [];
 let expenseList = [];
@@ -31,7 +28,6 @@ ipcRenderer.on('load-data-response', (event, data) => {
 
 document.getElementById('toggle').addEventListener('change', () => {
     updateTransactionView(document.getElementById('toggle').checked);
-    setCurrentPeriod(); 
 });
 
 const transactionModalInstance = new TransactionModal(
@@ -45,4 +41,3 @@ const detailViewInstance = new DetailView(transactionModalInstance);
 
 document.getElementById('income-box').addEventListener('click', () => detailViewInstance.openDetailView('income'));
 document.getElementById('expenses-box').addEventListener('click', () => detailViewInstance.openDetailView('expense'));
-

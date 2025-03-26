@@ -16,7 +16,6 @@ class TransactionModal {
         this.calendar = null;
         this.categoryDropdown = null;
         this.attachEventListeners();
-        console.log(this.transactionModal);
     }
 
     attachEventListeners() {
@@ -132,10 +131,7 @@ class TransactionModal {
             this.clearForm();
             this.toggleModal(false);
             this.categoryDropdown.setDropdownList();
-
-    
             this.dispatchTransactionSavedEvent(newTransaction);
-
         } catch (error) {
             console.error('Error adding transaction:', error);
         } 
@@ -145,7 +141,7 @@ class TransactionModal {
         const date = document.getElementById('date').value.split('.');
         const formattedDate = `${date[2]}-${date[1]}-${date[0]}`;
         const category = document.getElementById('category').value;
-        const amount = parseFloat(document.getElementById('amount').value);
+        const amount = parseFloat(document.getElementById('amount').value.replace(',', '.'));
         const isYearly = document.getElementById('toggle').checked;
     
         return { formattedDate, category, amount, isYearly };

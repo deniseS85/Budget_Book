@@ -56,15 +56,13 @@ class CategoryDropdown {
         const searchTerm = this.inputElement.value.toLowerCase();
         const filteredCategories = this.categories.filter(category => category.toLowerCase().includes(searchTerm));
 
-       /*  searchTerm.length > 0 ? this.inputElement.style.borderColor =  */
         if (searchTerm.length === 0) {
             this.renderCategories(this.categories);
             return;
         }
     
         if (filteredCategories.length === 0) {
-            this.renderCategories([]);
-            this.closeDropdown();
+            this.renderCategories([this.inputElement.value]);
             return;
         }
 

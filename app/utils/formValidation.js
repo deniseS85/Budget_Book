@@ -1,6 +1,6 @@
 function validateForm(saveButton) {
     const category = document.getElementById('category').value;
-    const amount = parseFloat(document.getElementById('amount').value);
+    const amount = parseFloat(document.getElementById('amount').value.replace(',', '.'));
 
     saveButton.disabled = !(category && !isNaN(amount));
 }

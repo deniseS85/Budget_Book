@@ -1,34 +1,38 @@
 function updateTransactionView(isYearly) {
-    const filteredIncome = filterByPeriod(incomeList, isYearly);
-    const filteredExpenses = filterByPeriod(expenseList, isYearly);
+    const incomeAverages = calculateAverage(incomeList, isYearly);
+    const expenseAverages = calculateAverage(expenseList, isYearly);
 
-    renderIncomeList(filteredIncome);
-    renderExpenseList(filteredExpenses);
+    renderIncomeList(incomeAverages);
+    renderExpenseList(expenseAverages);
 }
 
-function setCurrentPeriod() {
-    const isYearly = document.getElementById('toggle').checked;
-    const now = new Date();
-    const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-    const incomePeriodElement = document.getElementById('income-current-period');
-    const expensePeriodElement = document.getElementById('expenses-current-period');
-    const periodText = isYearly ? now.getFullYear() : monthNames[now.getMonth()];
+function calculateAverage(list, isYearly) {
+    let categories = {};
+    let monthsCount = {};
 
-    incomePeriodElement.textContent = periodText;
-    expensePeriodElement.textContent = periodText;
-}
+    for (let i = 0; i < list.length; i++) {
+        const item = list[i];
+        const category = item.category;
+        const amount = item.amount;
 
-function filterByPeriod(list, isYearly) {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth();
+        categories[category] ??= 0;
+        monthsCount[category] ??= 0;
 
-    return list.filter(item => {
-        const itemDate = new Date(item.date);
-        return isYearly
-            ? itemDate.getFullYear() === currentYear
-            : itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
+        categories[category] += amount;
+        monthsCount[category]++;
+    }
+
+    const result = Object.keys(categories).map(category => {
+        let monthlyAverage = categories[category] / monthsCount[category];
+        let yearlyAverage = monthlyAverage * 12;
+
+        return {
+            amount: isYearly ? yearlyAverage : monthlyAverage,
+            category: category
+        };
     });
+
+    return result;
 }
 
 function groupByCategory(list) {
@@ -71,7 +75,6 @@ function renderExpenseList(expenseList, append = false) {
 
 module.exports = {
     updateTransactionView,
-    setCurrentPeriod,
     renderIncomeList,
     renderExpenseList
 };

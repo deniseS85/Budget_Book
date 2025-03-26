@@ -1,18 +1,24 @@
 {
   "name": "haushaltsbuch",
   "version": "1.0.0",
-  "description": "",
+  "description": "Ein Haushaltsbuch",
   "main": "app/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "make": "electron-builder --mac"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "electron": "^35.0.1"
-  },
   "devDependencies": {
+    "electron": "^35.0.1",
+    "electron-builder": "25.1.8",
     "electron-reload": "^2.0.0-alpha.1"
+  },
+  "build": {
+    "appId": "com.denise.haushaltsbuch",
+    "mac": {
+      "target": "zip"
+    }
   }
 }
