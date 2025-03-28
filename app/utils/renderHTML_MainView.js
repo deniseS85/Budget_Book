@@ -68,7 +68,7 @@ function renderList(type, list, append = false) {
         const row = document.createElement('tr');
         row.innerHTML = /*html*/`
             <td>${item.category}</td>
-            <td>${item.totalAmount.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</td>`;
+            <td>${(item.totalAmount / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</td>`;
         tableBody.appendChild(row);
     });
 }

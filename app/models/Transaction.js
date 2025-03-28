@@ -10,8 +10,9 @@ class Transaction {
     }
 
     formatAmount() {
-        return `${this.amount.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+        return (this.amount / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
     }
+    
 }
 
 module.exports = Transaction;

@@ -6,10 +6,9 @@ class DetailView {
         this.detailViewHeader = document.querySelector('.detail-view-header');
         this.detailHeadline = this.detailViewHeader.querySelector('h4');
         this.closeDetails = document.getElementById('close-details');
-        this.detailsList = document.createElement('tbody');
+        this.detailsList = document.createElement('div');
         this.transactionModal = transactionModal;
         this.attachEventListeners();
-
         this.attachTransactionSavedListener(); 
     }
 
@@ -59,39 +58,49 @@ class DetailView {
     }
 
     createDetailsTable(list, type) {
-        const detailsTable = document.createElement('table');
-        detailsTable.appendChild(this.detailsList); 
+        this.detailsList.classList.add('detailsList');
+        const groupedByMonth = this.groupByMonthYear(list);
+        
+        Object.entries(groupedByMonth).forEach(([key, items]) => {
+            const [year, month] = key.split(' ');
+            const detailsTable = document.createElement('table');
+            const thead = document.createElement('thead');
+            thead.appendChild(this.createMonthHeader(month, year, type));
+            detailsTable.appendChild(thead);
     
-        const groupedByMonth = this.groupByMonth(list);
-        Object.entries(groupedByMonth).forEach(([month, items]) => {
-            this.detailsList.appendChild(this.createMonthHeader(month, type));
-            items.forEach(item => this.detailsList.appendChild(this.createDetailRow(item)));
+            const tbody = document.createElement('tbody');
+            items.forEach(item => tbody.appendChild(this.createDetailRow(item)));
+            
+            detailsTable.appendChild(tbody);
+            this.detailsList.appendChild(detailsTable);
         });
     
-        return detailsTable;
+        return this.detailsList;
     }
-
-    groupByMonth(transactionList) {
+        
+    groupByMonthYear(transactionList) {
         const grouped = {};
         const options = { month: 'long' };
 
         transactionList.forEach(item => {
             const date = new Date(item.date);
+            const year = date.getFullYear();
             const month = date.toLocaleString('de-DE', options);
+            const key = `${year} ${month}`;
 
-            if (!grouped[month]) { grouped[month] = []; }
-            grouped[month].push(item);
+            if (!grouped[key]) { grouped[key] = []; }
+            grouped[key].push(item);
         });
 
         return grouped;
     }
 
-    createMonthHeader(month, type) {
+    createMonthHeader(month, year, type) {
         const monthHeader = document.createElement('tr');
         monthHeader.innerHTML = /*html*/`
-            <td class='month-header ${type}' colspan='3'>
+            <td class='month-header ${type}' colspan='3'> 
                 <div class="month-header-wrapper">
-                    <span class="month-header-name">${month}</span>
+                    <span class='month-header-name ${type}' colspan='3'>${month} ${year}</span>
                 </div>
             </td>`;
         return monthHeader;

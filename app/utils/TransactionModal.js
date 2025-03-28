@@ -119,7 +119,12 @@ class TransactionModal {
         try {
             if (!this.transactionType) return console.error("Transaction type is missing!");
 
-            const newTransactionData = await addTransaction(this.transactionType, { date: formattedDate, category, amount });
+            const amountInCents = Math.round(amount * 100);
+            const newTransactionData = await addTransaction(this.transactionType, { 
+                date: formattedDate, 
+                category, 
+                amount: amountInCents
+            });
             
             const newTransaction = this.transactionType === 'income'
                 ? new Income(newTransactionData.date, newTransactionData.category, newTransactionData.amount)
