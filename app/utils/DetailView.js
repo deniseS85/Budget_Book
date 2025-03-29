@@ -60,10 +60,13 @@ class DetailView {
     createDetailsTable(list, type) {
         this.detailsList.classList.add('detailsList');
         const groupedByMonth = this.groupByMonthYear(list);
+
+        this.addSpacerTop();
         
         Object.entries(groupedByMonth).forEach(([key, items]) => {
             const [year, month] = key.split(' ');
             const detailsTable = document.createElement('table');
+
             const thead = document.createElement('thead');
             thead.appendChild(this.createMonthHeader(month, year, type));
             detailsTable.appendChild(thead);
@@ -95,14 +98,22 @@ class DetailView {
         return grouped;
     }
 
+    addSpacerTop() {
+        if (!this.detailsList.querySelector('.spacer')) {
+            const spacer = document.createElement('div');
+            spacer.classList.add('spacer');
+            this.detailsList.appendChild(spacer);
+        }
+    }
+
     createMonthHeader(month, year, type) {
         const monthHeader = document.createElement('tr');
         monthHeader.innerHTML = /*html*/`
-            <td class='month-header ${type}' colspan='3'> 
+            <th class='month-header ${type}' colspan='3'> 
                 <div class="month-header-wrapper">
                     <span class='month-header-name ${type}' colspan='3'>${month} ${year}</span>
                 </div>
-            </td>`;
+            </th>`;
         return monthHeader;
     }
     

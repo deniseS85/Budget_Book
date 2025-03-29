@@ -299,31 +299,41 @@ td:last-child {
     width: 100%;
     height: 100%;
     overflow: auto;
+    padding: 0px 24px 20px 24px;
 }
 
 .detailsList {
     width: 100%;
-    padding: 0px 24px 20px 24px;
 }
 
-.detail-view table {
+.detailsList table {
     width: 100%;
+    border-collapse: collapse; 
 }
 
-.detail-view table thead {
+.detailsList .spacer {
+    height: 25px;
+    background-color: var(--itemColor);
     position: sticky;
-    top: 5px;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+}
+
+.detailsList thead {
+    position: sticky;
+    top: 25px;
     z-index: 10;
     background-color: var(--itemColor);
 }
 
-.detail-view table td {
+.detailsList td {
     font-size: 14px;
 }
 
 .month-header {
     text-align: center;
-    padding: 10px 0;
+    font-weight: normal;
     position: relative;
     background-color: var(--itemColor);
 }
