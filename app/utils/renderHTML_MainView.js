@@ -9,29 +9,56 @@ function updateTransactionView(isYearly) {
 function calculateAverage(list, isYearly) {
     let categories = {};
     let monthsCount = {};
+    let firstDate = {};
+    let lastDate = {};
+    let entryCount = {};
+    let yearsCount = {};
 
     for (let i = 0; i < list.length; i++) {
         const item = list[i];
         const category = item.category;
         const amount = item.amount;
         
-        const monthYear = (typeof item.date === 'string' && item.date) 
-            ? item.date.slice(0, 7)
-            : item.date?.toISOString().slice(0, 7);
+        const dateObj = new Date(item.date);
+        const year = dateObj.getFullYear();
+        const monthYear = `${dateObj.getFullYear()}-${(dateObj.getMonth() + 1).toString().padStart(2, '0')}`;
 
         if (!monthYear) { continue; }
 
         categories[category] ??= 0;
         monthsCount[category] ??= new Set();
+        firstDate[category] ??= dateObj;
+        lastDate[category] ??= dateObj;
+        entryCount[category] ??= 0;
+        yearsCount[category] ??= new Set();
 
         categories[category] += amount;
         monthsCount[category].add(monthYear);
+        yearsCount[category].add(year);
+        entryCount[category]++;
+
+        if (dateObj < firstDate[category]) firstDate[category] = dateObj;
+        if (dateObj > lastDate[category]) lastDate[category] = dateObj;
     }
 
     const result = Object.keys(categories).map(category => {
-        const uniqueMonths = monthsCount[category].size;
-        const monthlyAverage = categories[category] / uniqueMonths;
-        const yearlyAverage = isYearly ? (uniqueMonths < 12 ? monthlyAverage * uniqueMonths : monthlyAverage * 12) : null;
+        const start = firstDate[category];
+        const end = lastDate[category];
+
+        let totalMonths = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()) + 1;
+        const totalYears = yearsCount[category].size;
+
+        const isYearlyPayment = entryCount[category] === totalYears;
+
+        if (totalMonths < 12) {
+            totalMonths = 12;
+        }
+     
+        const monthlyAverage = isYearlyPayment
+            ? categories[category] / 12 
+            : categories[category] / totalMonths;
+
+        const yearlyAverage = isYearly ? monthlyAverage * 12 : null;
 
         return {
             amount: isYearly ? yearlyAverage : monthlyAverage,
@@ -41,7 +68,6 @@ function calculateAverage(list, isYearly) {
 
     return result;
 }
-
 
 function groupByCategory(list) {
     return list.reduce((acc, item) => {
