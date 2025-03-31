@@ -4,69 +4,40 @@ function updateTransactionView(isYearly) {
 
     renderIncomeList(incomeAverages);
     renderExpenseList(expenseAverages);
+    updateTotalAmounts(isYearly);
 }
 
 function calculateAverage(list, isYearly) {
-    let categories = {};
-    let monthsCount = {};
-    let firstDate = {};
-    let lastDate = {};
-    let entryCount = {};
-    let yearsCount = {};
+    let data = {};
 
-    for (let i = 0; i < list.length; i++) {
-        const item = list[i];
-        const category = item.category;
-        const amount = item.amount;
-        
-        const dateObj = new Date(item.date);
+    for (const { category, amount, date } of list) {
+        const dateObj = new Date(date);
         const year = dateObj.getFullYear();
-        const monthYear = `${dateObj.getFullYear()}-${(dateObj.getMonth() + 1).toString().padStart(2, '0')}`;
+        const monthYear = `${year}-${(dateObj.getMonth() + 1).toString().padStart(2, '0')}`;
 
-        if (!monthYear) { continue; }
+        if (!monthYear) continue;
 
-        categories[category] ??= 0;
-        monthsCount[category] ??= new Set();
-        firstDate[category] ??= dateObj;
-        lastDate[category] ??= dateObj;
-        entryCount[category] ??= 0;
-        yearsCount[category] ??= new Set();
+        data[category] ||= { total: 0, months: new Set(), years: new Set(), count: 0, first: dateObj, last: dateObj };
 
-        categories[category] += amount;
-        monthsCount[category].add(monthYear);
-        yearsCount[category].add(year);
-        entryCount[category]++;
-
-        if (dateObj < firstDate[category]) firstDate[category] = dateObj;
-        if (dateObj > lastDate[category]) lastDate[category] = dateObj;
+        let entry = data[category];
+        entry.total += amount;
+        entry.months.add(monthYear);
+        entry.years.add(year);
+        entry.count++;
+        entry.first = entry.first < dateObj ? entry.first : dateObj;
+        entry.last = entry.last > dateObj ? entry.last : dateObj;
     }
 
-    const result = Object.keys(categories).map(category => {
-        const start = firstDate[category];
-        const end = lastDate[category];
-
-        let totalMonths = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()) + 1;
-        const totalYears = yearsCount[category].size;
-
-        const isYearlyPayment = entryCount[category] === totalYears;
-
-        if (totalMonths < 12) {
-            totalMonths = 12;
-        }
-     
-        const monthlyAverage = isYearlyPayment
-            ? categories[category] / 12 
-            : categories[category] / totalMonths;
-
-        const yearlyAverage = isYearly ? monthlyAverage * 12 : null;
+    return Object.entries(data).map(([category, entry]) => {
+        const totalMonths = Math.max(12, (entry.last.getFullYear() - entry.first.getFullYear()) * 12 + (entry.last.getMonth() - entry.first.getMonth()) + 1);
+        const isYearlyPayment = entry.count === entry.years.size;
+        const monthlyAverage = isYearlyPayment ? entry.total / 12 : entry.total / totalMonths;
 
         return {
-            amount: isYearly ? yearlyAverage : monthlyAverage,
-            category: category
+            amount: isYearly ? monthlyAverage * 12 : monthlyAverage,
+            category
         };
     });
-
-    return result;
 }
 
 function groupByCategory(list) {
@@ -84,11 +55,65 @@ function groupByCategory(list) {
     }, {});
 }
 
+function updateTotalAmounts(isYearly) {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+
+    const income = getCurrentDateAmount(isYearly, currentMonth, currentYear, incomeList, true);
+    const expense = getCurrentDateAmount(isYearly, currentMonth, currentYear, expenseList, true);
+
+    const formattedIncome = getCurrentDateAmount(isYearly, currentMonth, currentYear, incomeList);
+    const formattedExpense = getCurrentDateAmount(isYearly, currentMonth, currentYear, expenseList);
+    
+    const difference = income - expense;
+    const isNegative = difference < 0;
+   
+    const formattedDifference = (difference / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+
+    const timeLabel = isYearly 
+        ? currentYear 
+        : new Date(currentYear, currentMonth - 1).toLocaleString('de-DE', { month: 'long' });
+
+    const differenceClass = isNegative ? 'negative' : '';
+    
+    updateTextContent('totalIncomeText', `Einnahmen ${timeLabel}`, formattedIncome);
+    updateTextContent('totalExpenseText', `Ausgaben ${timeLabel}`, formattedExpense);
+    updateTextContent('differenceText', `Saldo ${timeLabel}`, formattedDifference, differenceClass);
+}
+
+function getCurrentDateAmount(isYearly, currentMonth, currentYear, list, isNumeric = false) {
+    const filtered = list.filter(({ date }) => {
+        const entryDate = new Date(date);
+        return isYearly ? entryDate.getFullYear() === currentYear : 
+                          entryDate.getFullYear() === currentYear && entryDate.getMonth() + 1 === currentMonth;
+    });
+
+    const totalAmount = filtered.reduce((sum, item) => sum + item.amount, 0);
+
+    return isNumeric 
+        ? totalAmount 
+        : (totalAmount / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+
+function updateTextContent(elementId, label, amount, additionalClass = '') {
+    const element = document.getElementById(elementId);
+    element.textContent = label;
+
+    const amountElement = document.getElementById(elementId.replace('Text', ''));
+    amountElement.textContent = amount;
+
+    additionalClass
+        ? amountElement.classList.add(additionalClass)
+        : amountElement.classList.remove('negative');
+}
+
 function renderList(type, list, append = false) {
     const tableBody = document.getElementById(`${type}-list`);
     if (!append) tableBody.innerHTML = '';
 
-    const groupedData = Object.values(groupByCategory(list));
+    const groupedData = Object.values(groupByCategory(list)).sort((a, b) => a.category.localeCompare(b.category));
+
 
     groupedData.forEach(item => {
         const row = document.createElement('tr');

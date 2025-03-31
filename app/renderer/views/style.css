@@ -3,7 +3,7 @@
     --itemColor: #171717;
     --fontColor: #dbdbdb;
     --subFontColor: silver;
-    --purple: #ab196c;
+    --purple: #d00f7c;
     --turquise: #57b2be;
     --lila: #937be2;
     --transaction-color: var(--turquise);
@@ -659,19 +659,59 @@ td:last-child {
     background-color: var(--transaction-hover-color);
 }
 
+.main-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-basis: 300px;
+    gap: 10px;
+}
+
+.main-top-container {
+    display: flex;
+    gap: 10px;
+}
+
+.top-left, .top-center, .top-right {
+    flex: 1;
+    height: 60px;
+    background-color: var(--itemColor);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.top-left div {
+    color: var(--turquise);
+}
+
+.top-center div {
+    color: var(--purple);
+}
+
+.top-right div {
+    color: var(--lila);
+}
+
+.negative {
+    color: #d91624 !important;
+}
+
 .center, .right {
     display: flex;
     justify-content: center;
+    align-items: center;
     padding: 20px 10px;
     background-color: var(--itemColor);
     border-radius: 10px;
+   
 }
 
 .center {
     flex-grow: 1;
-    flex-basis: 300px
 }
-
 
 .right {
     flex-grow: 0;
