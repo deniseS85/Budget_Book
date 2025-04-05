@@ -5,6 +5,11 @@ function updateTransactionView(isYearly) {
     renderIncomeList(incomeAverages);
     renderExpenseList(expenseAverages);
     updateTotalAmounts(isYearly);
+
+    /* ################################################# */
+                /* TEST */
+    /* ################################################# */
+    //logTransactionTable(incomeList, expenseList);
 }
 
 function calculateAverage(list, isYearly) {
@@ -29,7 +34,10 @@ function calculateAverage(list, isYearly) {
     }
 
     return Object.entries(data).map(([category, entry]) => {
-        const totalMonths = Math.max(12, (entry.last.getFullYear() - entry.first.getFullYear()) * 12 + (entry.last.getMonth() - entry.first.getMonth()) + 1);
+/*         const totalMonths = Math.max(12, (entry.last.getFullYear() - entry.first.getFullYear()) * 12 + (entry.last.getMonth() - entry.first.getMonth()) + 1);
+ */        
+        const totalMonths = entry.months.size; 
+
         const isYearlyPayment = entry.count === entry.years.size;
         const monthlyAverage = isYearlyPayment ? entry.total / 12 : entry.total / totalMonths;
 
@@ -59,22 +67,16 @@ function updateTotalAmounts(isYearly) {
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth() + 1;
-
     const income = getCurrentDateAmount(isYearly, currentMonth, currentYear, incomeList, true);
     const expense = getCurrentDateAmount(isYearly, currentMonth, currentYear, expenseList, true);
-
     const formattedIncome = getCurrentDateAmount(isYearly, currentMonth, currentYear, incomeList);
     const formattedExpense = getCurrentDateAmount(isYearly, currentMonth, currentYear, expenseList);
-    
     const difference = income - expense;
     const isNegative = difference < 0;
-   
     const formattedDifference = (difference / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
-
     const timeLabel = isYearly 
         ? currentYear 
         : new Date(currentYear, currentMonth - 1).toLocaleString('de-DE', { month: 'long' });
-
     const differenceClass = isNegative ? 'negative' : '';
     
     updateTextContent('totalIncomeText', `Einnahmen ${timeLabel}`, formattedIncome);
@@ -130,6 +132,39 @@ function renderIncomeList(incomeList, append = false) {
 
 function renderExpenseList(expenseList, append = false) {
     renderList('expenses', expenseList, append);
+}
+
+
+
+/* ################################################# */
+                /* TEST */
+/* ################################################# */
+function logTransactionTable(incomeList, expenseList) {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+    const incomeAverages = calculateAverage(incomeList, false);
+    const expenseAverages = calculateAverage(expenseList, false);
+    const incomeYearly = calculateAverage(incomeList, true);
+    const expenseYearly = calculateAverage(expenseList, true);
+    const incomeCurrentYear = getCurrentDateAmount(true, currentMonth, currentYear, incomeList, true);
+    const expenseCurrentYear = getCurrentDateAmount(true, currentMonth, currentYear, expenseList, true);
+    const incomeCurrentMonth = getCurrentDateAmount(false, currentMonth, currentYear, incomeList, true);
+    const expenseCurrentMonth = getCurrentDateAmount(false, currentMonth, currentYear, expenseList, true);
+    const data = [...incomeAverages, ...expenseAverages].map(({ category, amount }) => {
+        const yearlyAmount = incomeYearly.concat(expenseYearly).find(entry => entry.category === category)?.amount || 0;
+        return {
+            Kategorie: category,
+            "Ø Monat": (amount / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
+            "Ø Jahr": (yearlyAmount / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
+            "Gesamt Einnahmen aktueller Monat": (incomeCurrentMonth / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
+            "Gesamt Ausgaben aktueller Monat": (expenseCurrentMonth / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
+            "Gesamt Einnahmen aktuelles Jahr": (incomeCurrentYear / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
+            "Gesamt Ausgaben aktuelles Jahr": (expenseCurrentYear / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })
+        };
+    });
+
+    console.table(data);
 }
 
 module.exports = {

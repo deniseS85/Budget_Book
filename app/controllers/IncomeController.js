@@ -4,7 +4,7 @@ const Income = require('../models/Income');
 
 ipcMain.handle('add-income', (event, incomeData) => {
     const data = DataService.loadData();
-    const newIncome = new Income(incomeData.date, incomeData.category, incomeData.amount);
+    const newIncome = new Income(incomeData.date, incomeData.category, incomeData.amount, incomeData.paymentMethod);
 
     data.income.push(newIncome);
     DataService.saveData(data);

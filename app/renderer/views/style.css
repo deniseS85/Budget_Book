@@ -407,8 +407,8 @@ td:last-child {
     padding: 20px;
     border-radius: 10px;
     font-size: 16px;
-    width: 400px;
-    height: 300px;
+    width: 420px;
+    height: 320px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -717,5 +717,30 @@ td:last-child {
     flex-grow: 0;
     flex-basis: 250px;
 }
+
+.payment-method-container {
+    display: flex; 
+    justify-content: space-around;
+    width: 100%;
+}
+
+.payment-method {
+    width: 35px;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+.payment-method.income:hover,
+.payment-method.selected.income {
+    filter: brightness(0) saturate(100%) invert(94%) sepia(59%) saturate(3164%) hue-rotate(147deg) brightness(80%) contrast(79%);
+}
+
+.payment-method.expense:hover,
+.payment-method.selected.expense {
+    filter: brightness(0) saturate(100%) invert(15%) sepia(97%) saturate(3568%) hue-rotate(313deg) brightness(90%) contrast(99%);
+}
+
+
+
 
 

@@ -12,8 +12,8 @@ let incomeList = [];
 let expenseList = [];
 
 ipcRenderer.on('load-data-response', (event, data) => {
-    incomeList = data.income.map(item => new Income(item.date, item.category, item.amount));
-    expenseList = data.expenses.map(item => new Expense(item.date, item.category, item.amount));
+    incomeList = data.income.map(item => new Income(item.date, item.category, item.amount, item.paymendMethod));
+    expenseList = data.expenses.map(item => new Expense(item.date, item.category, item.amount, item.paymendMethod));
 
     incomeList = sortTransactionsByDate(incomeList);
     expenseList = sortTransactionsByDate(expenseList);

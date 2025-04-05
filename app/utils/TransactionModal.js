@@ -36,6 +36,7 @@ class TransactionModal {
         this.transactionType = type;
         this.modalHeader.innerHTML = this.transactionType === 'income' ? 'Neue Einnahme' : 'Neue Ausgabe';
         this.setTransactionColors(this.transactionType);
+        this.setTransactionIcons(this.transactionType);
         this.toggleModal(true);
         this.saveButton.disabled = true;
         this.openDatePicker();
@@ -63,7 +64,23 @@ class TransactionModal {
         document.documentElement.style.setProperty('--transaction-font-color', selectedColors.fontColor);
         document.documentElement.style.setProperty('--transaction-hover-color', selectedColors.hoverColor);
     }
-    
+
+    setTransactionIcons(type) {       
+        const images = document.querySelectorAll('.payment-method');
+
+        images.forEach(img => {
+            img.classList.remove('selected', 'income', 'expense');
+            img.classList.add(type);
+
+            img.addEventListener('click', () => {
+                images.forEach(i => i.classList.remove('selected'));
+                img.classList.add('selected');
+                this.paymentMethod = img.dataset.method;
+            });
+        });
+
+        this.paymentMethod = null;
+    }
 
     toggleModal(isVisible) {
         this.transactionModal.classList.toggle('visible', isVisible);
@@ -105,12 +122,17 @@ class TransactionModal {
         document.getElementById('category').addEventListener('input', () => validateForm(this.saveButton));
         document.getElementById('amount').addEventListener('input', () => validateForm(this.saveButton));
         document.getElementById('amount').addEventListener('keydown', validateAmountInput);
+        document.querySelectorAll('.payment-method').forEach(img => {
+            img.addEventListener('click', () => validateForm(this.saveButton));
+        });
     }
     
     clearForm() {
         document.getElementById('date').value = '';
         document.getElementById('category').value = '';
         document.getElementById('amount').value = '';
+        document.querySelectorAll('.payment-method').forEach(img => img.classList.remove('selected'));
+        this.paymentMethod = null; 
     }
 
     async saveTransaction() {
@@ -123,12 +145,13 @@ class TransactionModal {
             const newTransactionData = await addTransaction(this.transactionType, { 
                 date: formattedDate, 
                 category, 
-                amount: amountInCents
+                amount: amountInCents,
+                paymentMethod: this.paymentMethod
             });
             
             const newTransaction = this.transactionType === 'income'
-                ? new Income(newTransactionData.date, newTransactionData.category, newTransactionData.amount)
-                : new Expense(newTransactionData.date, newTransactionData.category, newTransactionData.amount);
+                ? new Income(newTransactionData.date, newTransactionData.category, newTransactionData.amount, newTransactionData.paymentMethod)
+                : new Expense(newTransactionData.date, newTransactionData.category, newTransactionData.amount, newTransactionData.paymentMethod);
 
             this.updateCategories(newTransactionData.category);
             this.addTransactionToList(this.transactionType, newTransactionData);
@@ -160,14 +183,13 @@ class TransactionModal {
 
     addTransactionToList(type, transactionData) {
         if (type === 'income') {
-            const newIncome = new Income(transactionData.date, transactionData.category, transactionData.amount);
+            const newIncome = new Income(transactionData.date, transactionData.category, transactionData.amount, transactionData.paymentMethod);
             insertTransaction(incomeList, newIncome, renderIncomeList);
         } else if (type === 'expense') {
-            const newExpense = new Expense(transactionData.date, transactionData.category, transactionData.amount);
+            const newExpense = new Expense(transactionData.date, transactionData.category, transactionData.amount, transactionData.paymentMethod);
             insertTransaction(expenseList, newExpense, renderExpenseList);
         }
     }
-
 
     dispatchTransactionSavedEvent(transaction) {
         const event = new CustomEvent('transactionSaved', {

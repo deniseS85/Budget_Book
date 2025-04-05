@@ -1,8 +1,9 @@
 function validateForm(saveButton) {
     const category = document.getElementById('category').value;
     const amount = parseFloat(document.getElementById('amount').value.replace(',', '.'));
+    const selectedMethod = document.querySelector('.payment-method.selected');
 
-    saveButton.disabled = !(category && !isNaN(amount));
+    saveButton.disabled = !(category && !isNaN(amount) && selectedMethod);
 }
 
 function validateAmountInput(event) {

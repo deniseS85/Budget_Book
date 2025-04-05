@@ -1,6 +1,6 @@
 const { ipcRenderer } = require('electron');
 
-function addTransaction(transactionType, { date, category, amount }) {
+function addTransaction(transactionType, { date, category, amount, paymentMethod }) {
     const channels = {
         income: 'add-income',
         expense: 'add-expense'
@@ -12,7 +12,7 @@ function addTransaction(transactionType, { date, category, amount }) {
         throw new Error(`Invalid transaction type: ${transactionType}`);
     }
 
-    return ipcRenderer.invoke(channel, { date, category, amount });
+    return ipcRenderer.invoke(channel, { date, category, amount, paymentMethod });
 }
 
 function insertTransaction(list, transaction, renderFunction) {
