@@ -1,3 +1,5 @@
+const TransactionUIConfig = require('../utils/TransactionUIConfig');
+const transactionUI = new TransactionUIConfig();
 class DetailView {
     constructor(transactionModal) {
         this.transactionWindow = document.getElementById('detail-window');
@@ -5,6 +7,7 @@ class DetailView {
         this.addExpensesBtn = document.getElementById('add-expenses');
         this.detailViewHeader = document.querySelector('.detail-view-header');
         this.detailHeadline = this.detailViewHeader.querySelector('h4');
+        this.detailView = document.querySelector('.detail-view'); 
         this.closeDetails = document.getElementById('close-details');
         this.detailsList = document.createElement('div');
         this.transactionModal = transactionModal;
@@ -21,7 +24,8 @@ class DetailView {
     }
 
     openDetailView(type) {
-        const config = this.getConfig(type);
+        const config = transactionUI.getTransactionConfig(type);
+        transactionUI.setTransactionColors(type);
         this.addIncomeBtn.style.display = type === 'income' ? 'inline-block' : 'none';
         this.addExpensesBtn.style.display = type === 'expense' ? 'inline-block' : 'none';
         this.detailViewHeader.classList.remove('income-detail-header', 'expenses-detail-header');
@@ -33,35 +37,34 @@ class DetailView {
         this.transactionWindow.classList.add('visible');
     }
 
-    getConfig(type) {
-        const config = {
-            income: {
-                title: 'Übersicht Einnahmen',
-                hoverColor: '#00ffcc',
-                headerClass: 'income-detail-header',
-                list: incomeList
-            },
-            expense: {
-                title: 'Übersicht Ausgaben',
-                hoverColor: '#fd0290',
-                headerClass: 'expenses-detail-header',
-                list: expenseList
-            }
-        };
-        return config[type];
+    renderDetailView(detailsTable) {
+        this.detailView.innerHTML = ''; 
+        const filterContainer = this.createFilterBar();
+        this.detailView.appendChild(filterContainer); 
+        this.detailView.appendChild(detailsTable);
+        this.detailView.scrollTop = 0;
     }
 
-    renderDetailView(detailsTable) {
-        const detailView = document.querySelector('.detail-view');
-        detailView.innerHTML = ''; 
-        detailView.appendChild(detailsTable);
+    /* ##########Buttons abhängig income oder expense ############# */
+    createFilterBar() {
+        const filterContainer = document.createElement('div');
+        filterContainer.classList.add('detail-view-filter');
+        filterContainer.innerHTML = /*html*/`
+            <input type="text" placeholder="Kategorie" id="filter-category">
+            <input type="number" placeholder="Min €" id="filter-min">
+            <input type="number" placeholder="Max €" id="filter-max">
+            <input type="date" id="filter-from">
+            <input type="date" id="filter-to">
+            <button id="apply-filter">Filtern</button>
+            <button id="clear-filter">Zurücksetzen</button>
+        `;
+        return filterContainer;
     }
+    /* ####################### */
 
     createDetailsTable(list, type) {
         this.detailsList.classList.add('detailsList');
         const groupedByMonth = this.groupByMonthYear(list);
-
-        this.addSpacerTop();
         
         Object.entries(groupedByMonth).forEach(([key, items]) => {
             const [year, month] = key.split(' ');
@@ -96,14 +99,6 @@ class DetailView {
         });
 
         return grouped;
-    }
-
-    addSpacerTop() {
-        if (!this.detailsList.querySelector('.spacer')) {
-            const spacer = document.createElement('div');
-            spacer.classList.add('spacer');
-            this.detailsList.appendChild(spacer);
-        }
     }
 
     createMonthHeader(month, year, type) {
@@ -149,11 +144,10 @@ class DetailView {
     }
 
     updateTransactionTable(transaction) {
-        const config = this.getConfig(transaction.type);
+        const config = transactionUI.getTransactionConfig(transaction.type);
         this.detailsList.innerHTML = '';
         this.renderDetailView(this.createDetailsTable(config.list, transaction.type));
-    }
-    
+    } 
 }
 
 module.exports = DetailView;

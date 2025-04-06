@@ -154,6 +154,7 @@ body {
     align-items: center;
     color: var(--subFontColor);
     overflow: auto;
+    padding-bottom: 12px;
     transition: box-shadow 0.2s ease;
 }
 
@@ -289,6 +290,31 @@ td:last-child {
  #close-details:hover {
     transform: scale(1.1);
 }
+
+
+/* ####################### */
+.detail-view-filter {
+    background-color: var(--itemColor);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: space-between;
+    padding: 10px 0;
+    margin: 10px 0;
+}
+
+.detail-view-filter button {
+    width: 140px;
+    height: 35px;
+    background-color: var(--transaction-color);
+    border: none;
+    border-radius: 10px;
+    color: var(--transaction-font-color);
+    transition: background-color 0.3s ease; 
+    cursor: pointer;
+}
+/* ####################### */
 
 .detail-view {
     display: flex;
@@ -706,7 +732,6 @@ td:last-child {
     padding: 20px 10px;
     background-color: var(--itemColor);
     border-radius: 10px;
-   
 }
 
 .center {
@@ -739,8 +764,4 @@ td:last-child {
 .payment-method.selected.expense {
     filter: brightness(0) saturate(100%) invert(15%) sepia(97%) saturate(3568%) hue-rotate(313deg) brightness(90%) contrast(99%);
 }
-
-
-
-
 

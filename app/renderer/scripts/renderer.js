@@ -1,10 +1,15 @@
 const { ipcRenderer } = require('electron');
 const Income = require('../../models/Income');
 const Expense = require('../../models/Expense'); 
+const Dashboard = require('../../utils/Dashboard');
+const dashboard = new Dashboard();
 const TransactionModal = require('../../utils/TransactionModal');
-const  DetailView = require('../../utils/DetailView');
-const { sortTransactionsByDate } = require('../../utils/transactionHandler');
-const { updateTransactionView } = require('../../utils/renderHTML_MainView');
+const DetailView = require('../../utils/DetailView');
+const TransactionManager = require('../../utils/TransactionManager');
+const transactionManager = new TransactionManager();
+
+/* const { updateTransactionView } = require('../../utils/renderHTML_MainView'); */
+
 
 window.onload = () => { ipcRenderer.send('load-data'); };
 
@@ -15,10 +20,10 @@ ipcRenderer.on('load-data-response', (event, data) => {
     incomeList = data.income.map(item => new Income(item.date, item.category, item.amount, item.paymendMethod));
     expenseList = data.expenses.map(item => new Expense(item.date, item.category, item.amount, item.paymendMethod));
 
-    incomeList = sortTransactionsByDate(incomeList);
-    expenseList = sortTransactionsByDate(expenseList);
+    incomeList = transactionManager.sortTransactionsByDate(incomeList);
+    expenseList = transactionManager.sortTransactionsByDate(expenseList);
 
-    updateTransactionView(false);
+    dashboard.updateTransactionView(false);
 
     const incomeCategories = incomeList.map(item => item.category);
     const expensesCategories = expenseList.map(item => item.category);
@@ -27,7 +32,7 @@ ipcRenderer.on('load-data-response', (event, data) => {
 });
 
 document.getElementById('toggle').addEventListener('change', () => {
-    updateTransactionView(document.getElementById('toggle').checked);
+    dashboard.updateTransactionView(document.getElementById('toggle').checked);
 });
 
 const transactionModalInstance = new TransactionModal(

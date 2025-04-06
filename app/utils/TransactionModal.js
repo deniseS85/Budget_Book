@@ -1,10 +1,15 @@
-const { validateForm, validateAmountInput } = require('../utils/formValidation');
 const { Calendar } = require('./Calendar');
 const { CategoryDropdown } = require('./CategoryDropdown');
-const { addTransaction, insertTransaction } = require('./transactionHandler');
-const { renderIncomeList, renderExpenseList, updateTransactionView } = require('../utils/renderHTML_MainView');
 const Income = require('../models/Income');
 const Expense = require('../models/Expense');
+const TransactionUIConfig = require('../utils/TransactionUIConfig');
+const transactionUI = new TransactionUIConfig();
+const TransactionManager = require('../utils/TransactionManager');
+const transactionManager = new TransactionManager();
+const Dashboard = require('../utils/Dashboard');
+const dashboard = new Dashboard();
+const FormValidator = require('../utils/FormValidator');
+
 class TransactionModal {
     constructor(transactionModal, saveButton, modalHeader, closeModalButton, categories = []) {
         this.transactionModal = transactionModal;
@@ -35,51 +40,14 @@ class TransactionModal {
     openTransactionModal(type) {
         this.transactionType = type;
         this.modalHeader.innerHTML = this.transactionType === 'income' ? 'Neue Einnahme' : 'Neue Ausgabe';
-        this.setTransactionColors(this.transactionType);
-        this.setTransactionIcons(this.transactionType);
+        transactionUI.setTransactionColors(this.transactionType);
+        transactionUI.setTransactionIcons(this.transactionType);
         this.toggleModal(true);
         this.saveButton.disabled = true;
         this.openDatePicker();
         this.openCategoryDropdown();
-        this.checkValidation();
-    }
-
-    setTransactionColors(type) {
-        const colors = {
-            income: {
-                color: 'var(--turquise)',
-                fontColor: 'var(--itemColor)',
-                hoverColor: '#00ffcc'
-            },
-            expense: {
-                color: 'var(--purple)',
-                fontColor: 'var(--fontColor)',
-                hoverColor: '#fd0290'
-            }
-        };
-    
-        const selectedColors = colors[type];
-    
-        document.documentElement.style.setProperty('--transaction-color', selectedColors.color);
-        document.documentElement.style.setProperty('--transaction-font-color', selectedColors.fontColor);
-        document.documentElement.style.setProperty('--transaction-hover-color', selectedColors.hoverColor);
-    }
-
-    setTransactionIcons(type) {       
-        const images = document.querySelectorAll('.payment-method');
-
-        images.forEach(img => {
-            img.classList.remove('selected', 'income', 'expense');
-            img.classList.add(type);
-
-            img.addEventListener('click', () => {
-                images.forEach(i => i.classList.remove('selected'));
-                img.classList.add('selected');
-                this.paymentMethod = img.dataset.method;
-            });
-        });
-
-        this.paymentMethod = null;
+        const formValidator = new FormValidator(this.saveButton);
+        formValidator.checkValidation();
     }
 
     toggleModal(isVisible) {
@@ -116,16 +84,6 @@ class TransactionModal {
         const dropdownList = document.getElementById('dropdown');
         this.categoryDropdown = new CategoryDropdown(categoryInput, dropdownList, this.categories);
     }
-
-    checkValidation() {  
-        document.getElementById('dropdown').addEventListener('click', () => validateForm(this.saveButton));
-        document.getElementById('category').addEventListener('input', () => validateForm(this.saveButton));
-        document.getElementById('amount').addEventListener('input', () => validateForm(this.saveButton));
-        document.getElementById('amount').addEventListener('keydown', validateAmountInput);
-        document.querySelectorAll('.payment-method').forEach(img => {
-            img.addEventListener('click', () => validateForm(this.saveButton));
-        });
-    }
     
     clearForm() {
         document.getElementById('date').value = '';
@@ -142,11 +100,13 @@ class TransactionModal {
             if (!this.transactionType) return console.error("Transaction type is missing!");
 
             const amountInCents = Math.round(amount * 100);
-            const newTransactionData = await addTransaction(this.transactionType, { 
+            const paymentMethod = transactionUI.getPaymentMethod(); 
+
+            const newTransactionData = await transactionManager.addTransaction(this.transactionType, { 
                 date: formattedDate, 
                 category, 
                 amount: amountInCents,
-                paymentMethod: this.paymentMethod
+                paymentMethod: paymentMethod
             });
             
             const newTransaction = this.transactionType === 'income'
@@ -155,7 +115,7 @@ class TransactionModal {
 
             this.updateCategories(newTransactionData.category);
             this.addTransactionToList(this.transactionType, newTransactionData);
-            updateTransactionView(isYearly);
+            dashboard.updateTransactionView(isYearly);
             this.clearForm();
             this.toggleModal(false);
             this.categoryDropdown.setDropdownList();
@@ -184,10 +144,11 @@ class TransactionModal {
     addTransactionToList(type, transactionData) {
         if (type === 'income') {
             const newIncome = new Income(transactionData.date, transactionData.category, transactionData.amount, transactionData.paymentMethod);
-            insertTransaction(incomeList, newIncome, renderIncomeList);
+            transactionManager.insertTransaction(incomeList, newIncome, (list) => dashboard.renderIncomeList(list));
+
         } else if (type === 'expense') {
             const newExpense = new Expense(transactionData.date, transactionData.category, transactionData.amount, transactionData.paymentMethod);
-            insertTransaction(expenseList, newExpense, renderExpenseList);
+            transactionManager.insertTransaction(expenseList, newExpense, (list) => dashboard.renderIncomeList(list));
         }
     }
 
