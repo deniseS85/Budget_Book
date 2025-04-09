@@ -8,9 +8,6 @@ const DetailView = require('../../utils/DetailView');
 const TransactionManager = require('../../utils/TransactionManager');
 const transactionManager = new TransactionManager();
 
-/* const { updateTransactionView } = require('../../utils/renderHTML_MainView'); */
-
-
 window.onload = () => { ipcRenderer.send('load-data'); };
 
 let incomeList = [];
@@ -25,10 +22,25 @@ ipcRenderer.on('load-data-response', (event, data) => {
 
     dashboard.updateTransactionView(false);
 
-    const incomeCategories = incomeList.map(item => item.category);
+   /*  const incomeCategories = incomeList.map(item => item.category);
     const expensesCategories = expenseList.map(item => item.category);
     const allCategories = [...new Set([...incomeCategories, ...expensesCategories])];
     transactionModalInstance.updateCategoriesData(allCategories); 
+    detailViewInstance.updateCategoriesData(allCategories); */
+
+    const incomeCategories = [...new Set(incomeList.map(item => item.category))];
+    const expenseCategories = [...new Set(expenseList.map(item => item.category))];
+
+    transactionModalInstance.updateCategoriesData({
+        income: incomeCategories,
+        expense: expenseCategories
+    });
+
+    detailViewInstance.updateCategoriesData({
+        income: incomeCategories,
+        expense: expenseCategories
+    });
+
 });
 
 document.getElementById('toggle').addEventListener('change', () => {

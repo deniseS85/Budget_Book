@@ -27,14 +27,23 @@
     width: 3px;
 }
 
-.income-box::-webkit-scrollbar-thumb {
-    background-color: var(--turquise);
+.detail-view::-webkit-scrollbar-thumb,
+.dropdown-list::-webkit-scrollbar-thumb,
+.income-box::-webkit-scrollbar-thumb,
+.expenses-box::-webkit-scrollbar-thumb {
     border-radius: 10px;
 }
 
+.detail-income::-webkit-scrollbar-thumb,
+.dropdown-income::-webkit-scrollbar-thumb,
+.income-box::-webkit-scrollbar-thumb {
+    background-color: var(--turquise);
+}
+
+.detail-expense::-webkit-scrollbar-thumb,
+.dropdown-expense::-webkit-scrollbar-thumb,
 .expenses-box::-webkit-scrollbar-thumb {
     background-color: var(--purple);
-    border-radius: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -276,7 +285,7 @@ td:last-child {
 
 #add-expenses:hover {
     transform: scale(1.1);
-    color: #fd0290;
+    color: #ff00aa ;
 }
  
 #close-details {
@@ -291,31 +300,6 @@ td:last-child {
     transform: scale(1.1);
 }
 
-
-/* ####################### */
-.detail-view-filter {
-    background-color: var(--itemColor);
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    width: 100%;
-    justify-content: space-between;
-    padding: 10px 0;
-    margin: 10px 0;
-}
-
-.detail-view-filter button {
-    width: 140px;
-    height: 35px;
-    background-color: var(--transaction-color);
-    border: none;
-    border-radius: 10px;
-    color: var(--transaction-font-color);
-    transition: background-color 0.3s ease; 
-    cursor: pointer;
-}
-/* ####################### */
-
 .detail-view {
     display: flex;
     flex-direction: column;
@@ -328,6 +312,118 @@ td:last-child {
     padding: 0px 24px 20px 24px;
 }
 
+/* ################################## */
+.detail-view-filter {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background-color: var(--itemColor);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 30px 0 0 0;
+    width: 100%;
+    justify-content: center;
+    min-height: 80px;
+}
+
+.detail-view-filter input {
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: var(--itemColor);
+    border: 1px solid var(--transaction-color);
+    outline: none;
+    color: var(--fontColor);
+    height: 35px;
+    width: 160px;
+    cursor: pointer;
+    transition: box-shadow 0.2s ease;
+}
+
+.detail-view-filter input:hover  {
+    box-shadow: 0 0 0 1px var(--transaction-hover-color);
+}
+
+.detail-view-filter input::placeholder {
+    color: var(--fontColor);
+}
+
+.filter-category-container {
+    position: relative;
+}
+
+#filter-category-input.open-dropdown {
+    cursor: pointer;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: none;
+    border-bottom: none;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+#filter-category-input.open-dropdown:hover {
+    background: var(--transaction-color);
+}
+
+#filter-category-input.open-dropdown:hover::placeholder {
+    color: var(--transaction-font-color);
+}
+
+#filter-category-input.close-dropdown:hover::placeholder {
+    color: var(--fontColor);
+    transition-delay: 0.3s;
+}
+
+#filter-category-input.close-dropdown {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    transition: all 0.3s ease 0.3s;
+}
+
+#filter-category-input:focus {
+    caret-color: transparent;
+}
+
+.filter-category-container #filter-category-dropdown {
+    top: 35px;
+    overflow-x: hidden;
+}
+
+.filter-category-container #filter-category-dropdown.open {
+    max-height: 168px;
+}
+
+.filter-category-container #filter-category-dropdown li {
+    padding: 7px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; 
+}
+
+.detail-view-filter button {
+    width: 60px;
+    height: 35px;
+    background-color: var(--transaction-color);
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease; 
+    cursor: pointer;
+}
+
+.detail-view-filter button:hover {
+    background-color: var(--transaction-hover-color);
+}
+  
+#apply-filter img, #clear-filter img {
+    width: 20px; 
+    object-fit: contain;
+    vertical-align: middle;
+}
+/* ################################## */
+
+
 .detailsList {
     width: 100%;
 }
@@ -337,18 +433,9 @@ td:last-child {
     border-collapse: collapse; 
 }
 
-.detailsList .spacer {
-    height: 25px;
-    background-color: var(--itemColor);
-    position: sticky;
-    top: 0;
-    width: 100%;
-    z-index: 1;
-}
-
 .detailsList thead {
     position: sticky;
-    top: 25px;
+    top: 80px;
     z-index: 10;
     background-color: var(--itemColor);
 }
@@ -646,7 +733,7 @@ td:last-child {
 
 .dropdown-list.open {
     visibility: visible;
-    max-height: 150px;
+    max-height: 178px;
 }
 
 .dropdown-list li {
@@ -741,6 +828,9 @@ td:last-child {
 .right {
     flex-grow: 0;
     flex-basis: 250px;
+
+    /* wieder löschen !!!  */
+    display: none;
 }
 
 .payment-method-container {

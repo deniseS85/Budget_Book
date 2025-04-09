@@ -1,5 +1,5 @@
 const { Calendar } = require('./Calendar');
-const { CategoryDropdown } = require('./CategoryDropdown');
+const { CategoryDropdown } = require('../utils/CategoryDropdown');
 const Income = require('../models/Income');
 const Expense = require('../models/Expense');
 const TransactionUIConfig = require('../utils/TransactionUIConfig');
@@ -11,13 +11,13 @@ const dashboard = new Dashboard();
 const FormValidator = require('../utils/FormValidator');
 
 class TransactionModal {
-    constructor(transactionModal, saveButton, modalHeader, closeModalButton, categories = []) {
+    constructor(transactionModal, saveButton, modalHeader, closeModalButton) {
         this.transactionModal = transactionModal;
         this.saveButton = saveButton;
         this.modalHeader = modalHeader;
         this.closeModalButton = closeModalButton;
         this.transactionType = '';
-        this.categories = categories; 
+        this.categories = { income: [], expense: [] }; 
         this.calendar = null;
         this.categoryDropdown = null;
         this.attachEventListeners();
@@ -41,11 +41,11 @@ class TransactionModal {
         this.transactionType = type;
         this.modalHeader.innerHTML = this.transactionType === 'income' ? 'Neue Einnahme' : 'Neue Ausgabe';
         transactionUI.setTransactionColors(this.transactionType);
-        transactionUI.setTransactionIcons(this.transactionType);
+        transactionUI.setPaymentMethodIcon(this.transactionType);
         this.toggleModal(true);
         this.saveButton.disabled = true;
         this.openDatePicker();
-        this.openCategoryDropdown();
+        this.openCategoryDropdown(this.transactionType);
         const formValidator = new FormValidator(this.saveButton);
         formValidator.checkValidation();
     }
@@ -79,10 +79,11 @@ class TransactionModal {
         this.categories = categories;
     }
 
-    openCategoryDropdown() {
+    openCategoryDropdown(type) {
         const categoryInput = document.getElementById('category');
         const dropdownList = document.getElementById('dropdown');
-        this.categoryDropdown = new CategoryDropdown(categoryInput, dropdownList, this.categories);
+        const categories = this.categories[type] || [];
+        this.categoryDropdown = new CategoryDropdown(categoryInput, dropdownList, categories);
     }
     
     clearForm() {
@@ -136,8 +137,9 @@ class TransactionModal {
     }
 
     updateCategories(newCategory) {
-        if (!this.categories.includes(newCategory)) {
-            this.updateCategoriesData([...this.categories, newCategory]);
+        if (!this.categories[this.transactionType].includes(newCategory)) {
+            this.categories[this.transactionType].push(newCategory);
+            this.updateCategoriesData(this.categories);
         }
     }
 

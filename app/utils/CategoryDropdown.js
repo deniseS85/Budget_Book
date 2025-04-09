@@ -3,7 +3,7 @@ class CategoryDropdown {
         this.inputElement = inputElement;
         this.dropdownElement = dropdownElement;
         this.isOpen = false;
-        this.categories = categories;
+        this.categories = Array.isArray(categories) ? categories : [];
         this.setDropdownList();
         this.attachEventListeners();
     }
@@ -27,8 +27,6 @@ class CategoryDropdown {
     closeDropdown() {
         this.dropdownElement.classList.remove('open');
         this.inputElement.classList.remove('open-dropdown');
-
-        
         this.inputElement.classList.add('close-dropdown');
 
         setTimeout(() => {
@@ -44,6 +42,8 @@ class CategoryDropdown {
             this.dropdownElement.innerHTML = '<li>Keine Kategorien verfügbar</li>';
             return;
         }
+
+        categories.sort((a, b) => a.localeCompare(b));
         
         categories.forEach(category => {
             const li = document.createElement('li');
@@ -78,8 +78,10 @@ class CategoryDropdown {
     }
 
     updateCategoriesData(categories) {
-        this.categories = categories; 
-        this.renderCategories(categories); 
+        if (JSON.stringify(this.categories) !== JSON.stringify(categories)) {
+            this.categories = categories;
+            this.renderCategories(categories); 
+        }
     }
 
     setDropdownList() {

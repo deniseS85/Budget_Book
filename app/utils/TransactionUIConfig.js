@@ -13,7 +13,7 @@ class TransactionUIConfig {
             },
             expense: {
                 title: 'Übersicht Ausgaben',
-                hoverColor: '#fd0290',
+                hoverColor: '#ff00aa',
                 headerClass: 'expenses-detail-header',
                 list: expenseList
             }
@@ -31,7 +31,7 @@ class TransactionUIConfig {
             expense: {
                 color: 'var(--purple)',
                 fontColor: 'var(--fontColor)',
-                hoverColor: '#fd0290'
+                hoverColor: '#ff00aa'
             }
         };
         const selectedColors = colors[type];
@@ -40,7 +40,7 @@ class TransactionUIConfig {
         document.documentElement.style.setProperty('--transaction-hover-color', selectedColors.hoverColor);
     }
 
-    setTransactionIcons(type) {       
+    setPaymentMethodIcon(type) {       
         const images = document.querySelectorAll('.payment-method');
         images.forEach(img => {
             img.classList.remove('selected', 'income', 'expense');
@@ -51,6 +51,29 @@ class TransactionUIConfig {
                 this.paymentMethod = img.dataset.method;
             });
         });
+    }
+
+    setButtonImage(buttonId, imageType, type) {
+        const button = document.getElementById(buttonId);
+        
+        if (button) {
+            const img = document.createElement('img');
+            img.alt = `${imageType}Filter`;
+    
+            if (type === 'income') {
+                img.src = `../../assets/img/${imageType}_income.png`;
+            } else if (type === 'expense') {
+                img.src = `../../assets/img/${imageType}_expense.png`;
+            }
+    
+            button.innerHTML = '';
+            button.appendChild(img);
+        }
+    }
+    
+    setFilterButtonsImg(type) {
+        this.setButtonImage('apply-filter', 'filter', type);
+        this.setButtonImage('clear-filter', 'reset', type);
     }
 
     getPaymentMethod() {
