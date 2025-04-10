@@ -312,7 +312,6 @@ td:last-child {
     padding: 0px 24px 20px 24px;
 }
 
-/* ################################## */
 .detail-view-filter {
     position: sticky;
     top: 0;
@@ -350,6 +349,7 @@ td:last-child {
 
 .filter-category-container {
     position: relative;
+    height: 35px;
 }
 
 #filter-category-input.open-dropdown {
@@ -385,16 +385,16 @@ td:last-child {
     caret-color: transparent;
 }
 
-.filter-category-container #filter-category-dropdown {
+#filter-category-dropdown {
     top: 35px;
     overflow-x: hidden;
 }
 
-.filter-category-container #filter-category-dropdown.open {
+#filter-category-dropdown.open {
     max-height: 168px;
 }
 
-.filter-category-container #filter-category-dropdown li {
+#filter-category-dropdown li {
     padding: 7px 10px;
     cursor: pointer;
     white-space: nowrap;
@@ -402,9 +402,57 @@ td:last-child {
     text-overflow: ellipsis; 
 }
 
-.detail-view-filter button {
-    width: 60px;
+.filter-amount-container {
+    display: flex;
+    gap: 2px;
     height: 35px;
+    align-items: center;
+}
+
+.filter-amount-container input {
+    width: 100px;
+}
+
+.filter-calendar-container {
+    position: relative;
+    height: 35px;
+}
+
+#filter-date {
+    width: 180px;
+}
+
+#filter-date:focus {
+    caret-color: transparent;
+}
+
+.filter-calendar-container:has(#filter-calendar.open) #filter-date {
+    box-shadow: none;
+}
+
+#filter-calendar {
+    position: absolute;
+    width: 234.41px;
+}
+
+.range-highlight {
+    background-color: var(--transaction-color);
+    color: var(--transaction-font-color);
+}
+
+.range-start, .range-end {
+    background-color: var(--transaction-color);
+}
+
+.filter-btn-container {
+    display: flex;
+    height: 35px;
+    gap: 10px;
+    margin-left: 40px;
+}
+
+.filter-btn-container  button {
+    width: 40px;
     background-color: var(--transaction-color);
     border: none;
     border-radius: 5px;
@@ -412,7 +460,7 @@ td:last-child {
     cursor: pointer;
 }
 
-.detail-view-filter button:hover {
+.filter-btn-container button:hover {
     background-color: var(--transaction-hover-color);
 }
   
@@ -421,8 +469,6 @@ td:last-child {
     object-fit: contain;
     vertical-align: middle;
 }
-/* ################################## */
-
 
 .detailsList {
     width: 100%;
@@ -686,8 +732,8 @@ td:last-child {
     transition: background-color 0.3s ease; 
     border-radius: 50%;
 }
-  
-.day:not(.today):hover {
+
+.day:not(.today):not(.range-end):hover {
     background: var(--bg);
 }
 

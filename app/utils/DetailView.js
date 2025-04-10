@@ -1,6 +1,8 @@
 const TransactionUIConfig = require('../utils/TransactionUIConfig');
 const transactionUI = new TransactionUIConfig();
 const { CategoryDropdown } = require('../utils/CategoryDropdown');
+const { Calendar } = require('../utils/Calendar');
+const FormValidator = require('../utils/FormValidator');
 
 class DetailView {
     constructor(transactionModal) {
@@ -16,6 +18,7 @@ class DetailView {
         this.transactionType = '';
         this.categories = { income: [], expense: [] }; 
         this.categoryDropdown = null;
+        this.calendar = null;
         this.attachEventListeners();
         this.attachTransactionSavedListener(); 
     }
@@ -29,6 +32,8 @@ class DetailView {
         this.transactionWindow.addEventListener('click', (event) => {
             if (this.categoryDropdown?.isOpen && !event.target.closest('#filter-category-input, #filter-category-dropdown')) {
                 this.categoryDropdown.closeDropdown();
+            } else if (this.calendar?.isOpen && !event.target.closest('#filter-date, #filter-calendar')) {
+                this.calendar.closeCalendar();
             }
         });
     }
@@ -62,6 +67,22 @@ class DetailView {
         this.renderDetailView(this.createDetailsTable(config.list, this.transactionType), this.transactionType)
         transactionUI.setFilterButtonsImg(this.transactionType);
         this.openCategoryDropdown(this.transactionType);
+        this.openDatePicker();
+        this.resetFilterInputs();
+    }
+
+    resetFilterInputs() {
+        const clearFilterBtn = document.getElementById('clear-filter');
+        if (clearFilterBtn) {
+            clearFilterBtn.addEventListener('click', this.resetFilters.bind(this));
+        }
+    }
+
+    resetFilters() {
+        document.getElementById('filter-category-input').value = '';
+        document.getElementById('filter-amount-from').value = '';
+        document.getElementById('filter-amount-to').value = '';
+        document.getElementById('filter-date').value = 'Alle Daten';
     }
 
     updateCategoriesData(categories) {
@@ -72,7 +93,20 @@ class DetailView {
         const categoryFilterInput = document.getElementById('filter-category-input');
         const dropdownList = document.getElementById('filter-category-dropdown');
         const categories = this.categories[type] || [];
-        this.categoryDropdown = new CategoryDropdown(categoryFilterInput, dropdownList, categories);
+        this.categoryDropdown = new CategoryDropdown(categoryFilterInput, dropdownList, categories, true);
+    }
+
+    openDatePicker() {
+        const dateInput = document.getElementById('filter-date');
+        dateInput.value = 'Alle Daten';
+    
+        this.calendar = new Calendar(document.getElementById('filter-calendar'), dateInput, true, this.transactionType);
+    
+        if (this.dateInputClickListener) {
+            dateInput.removeEventListener('click', this.dateInputClickListener);
+        }
+        this.dateInputClickListener = () => this.calendar.toggleCalendar();
+        dateInput.addEventListener('click', this.dateInputClickListener);
     }
 
     renderDetailView(detailsTable, type) {
@@ -83,9 +117,9 @@ class DetailView {
         this.detailView.scrollTop = 0;
     }
 
-    /* ##########Buttons abhängig income oder expense ############# */
     createFilterBar(type) {
         const filterContainer = document.createElement('div');
+
         filterContainer.classList.add('detail-view-filter');
         filterContainer.innerHTML = /*html*/`
             <div class="filter-category-container">
@@ -93,18 +127,34 @@ class DetailView {
                 <ul class="dropdown-list dropdown-${type}" id="filter-category-dropdown"></ul>
             </div>
 
+            <div class="filter-amount-container">
+                <input type="text" id="filter-amount-from" placeholder="Betrag von" autocomplete="off">
+                <span>&ndash;</span>
+                <input type="text" id="filter-amount-to" placeholder="Betrag bis" autocomplete="off">
+            </div>
+            
+            <div class="filter-calendar-container">
+                <input type="text" id="filter-date">
+                <div id="filter-calendar" class="calendar"></div>
+            </div>
+           
+            <div class="filter-btn-container">
+                <button id="apply-filter"></button>
+                <button id="clear-filter"></button>
+            </div>`;
 
-           <!--  <input type="text" placeholder="Kategorie" id="filter-category"> -->
-            <input type="number" placeholder="Alle Beträge" id="filter-min">
-           <!--  <input type="number" placeholder="Max €" id="filter-max"> -->
-            <input type="date" id="filter-from">
-            <!-- <input type="date" id="filter-to"> -->
-            <button id="apply-filter"></button>
-            <button id="clear-filter"></button>
-        `;
+        this.validateAmountInput();
+
         return filterContainer;
     }
-    /* ####################### */
+
+    validateAmountInput() {
+        setTimeout(() => {
+            const formValidator = new FormValidator();
+            document.getElementById('filter-amount-from').addEventListener('keydown', (event) => formValidator.validateAmountInput(event));
+            document.getElementById('filter-amount-to').addEventListener('keydown', (event) => formValidator.validateAmountInput(event));
+        }, 0); 
+    }
 
     createDetailsTable(list, type) {
         this.detailsList.classList.add('detailsList');
@@ -170,6 +220,7 @@ class DetailView {
         this.addIncomeBtn.style.display = 'none';
         this.addExpensesBtn.style.display = 'none';
         this.categoryDropdown?.closeDropdown();
+        this.calendar?.closeCalendar();
     }
 
     handleMouseOver(event) {
@@ -189,9 +240,9 @@ class DetailView {
     }
 
     updateTransactionTable(transaction) {
+        this.transactionType = transaction.type;
         const config = transactionUI.getTransactionConfig(transaction.type);
-        this.detailsList.innerHTML = '';
-        this.renderDetailView(this.createDetailsTable(config.list, transaction.type));
+        this.updateDetailViewBody(config);
     } 
 }
 

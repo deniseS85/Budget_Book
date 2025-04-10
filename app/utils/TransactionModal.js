@@ -1,4 +1,4 @@
-const { Calendar } = require('./Calendar');
+const { Calendar } = require('../utils/Calendar');
 const { CategoryDropdown } = require('../utils/CategoryDropdown');
 const Income = require('../models/Income');
 const Expense = require('../models/Expense');
@@ -67,7 +67,7 @@ class TransactionModal {
 
         dateInput.value = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
     
-        this.calendar = new Calendar(document.getElementById('calendar'), dateInput);
+        this.calendar = new Calendar(document.getElementById('calendar'), dateInput, false, this.transactionType);
     
         if (!this.dateInputClickListener) {
             this.dateInputClickListener = () => this.calendar.toggleCalendar();

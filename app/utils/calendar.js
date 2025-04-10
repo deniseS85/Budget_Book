@@ -1,8 +1,17 @@
+const TransactionUIConfig = require('../utils/TransactionUIConfig');
+
 class Calendar {
-    constructor(calender, dateInput) {
+    constructor(calender, dateInput, isFilterBar, transactionType) {
         this.calender = calender;
         this.dateInput = dateInput;
         this.isOpen = false;
+        this.isFilterBar = isFilterBar;
+        this.transactionType = transactionType; 
+        this.transactionConfig = new TransactionUIConfig();
+        this.rangeStart = null;
+        this.rangeEnd = null;
+        this.hoveredDate = null;
+        this.transactionConfig.setTransactionColors(this.transactionType);
     }
 
     toggleCalendar() {
@@ -77,32 +86,104 @@ class Calendar {
 
     createDays(firstDay, lastDate, year, month) {
         const today = new Date();
-        const todayDay = today.getDate();
-        const todayMonth = today.getMonth();
-        const todayYear = today.getFullYear();
         const startOffset = firstDay === 0 ? 6 : firstDay - 1;
-    
+
+        this.addEmptyCells(startOffset);
+        this.addDays(lastDate, year, month, today);
+    }
+
+    addEmptyCells(startOffset) {
         Array.from({ length: startOffset }).forEach(() => {
             const emptyCell = document.createElement('div');
             emptyCell.style.visibility = 'hidden';
             this.calender.appendChild(emptyCell);
         });
-    
-        Array.from({ length: lastDate }).forEach((_, day) => {
-            const dayElement = document.createElement('div');
-            dayElement.classList.add('day');
-            dayElement.textContent = day + 1;
+    }
 
-            if (day + 1 === todayDay && month === todayMonth && year === todayYear) {
-                dayElement.classList.add('today');
-            }
+    addDays(lastDate, year, month, today) {
+        Array.from({ length: lastDate }).forEach((_, i) => {
+            const day = i + 1;
+            const dayDate = new Date(year, month, day);
+            const dayElement = this.createDayElement(day, dayDate, today, year, month);
 
-            dayElement.addEventListener('click', () => {
-                this.dateInput.value = `${String(day + 1).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}`;
-                this.closeCalendar();
-            });
             this.calender.appendChild(dayElement);
         });
+    }
+
+    createDayElement(day, dayDate, today, year, month) {
+        const dayElement = document.createElement('div');
+        dayElement.classList.add('day');
+        dayElement.textContent = day;
+
+        if (!this.isFilterBar) {
+            this.addDayClickListener(dayElement, day, month, year);
+            if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                dayElement.classList.add('today');
+            }
+        } else {
+            this.addRangeListeners(dayElement, dayDate);
+        }
+
+        dayElement.dataset.date = dayDate.toISOString();
+        return dayElement;
+    }
+
+    addDayClickListener(dayElement, day, month, year) {
+        dayElement.addEventListener('click', () => {
+            this.dateInput.value = `${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}`;
+            this.closeCalendar();
+        });
+    }
+
+    addRangeListeners(dayElement, dayDate) {
+        dayElement.addEventListener('click', () => this.handleRangeClick(dayDate));
+        dayElement.addEventListener('mouseenter', () => {
+            if (this.rangeStart && !this.rangeEnd) {
+                this.hoveredDate = dayDate;
+                this.highlightRange();
+            }
+        });
+    }
+
+    handleRangeClick(date) {
+        if (!this.rangeStart || this.rangeEnd) {
+            this.rangeStart = date;
+            this.rangeEnd = null;
+            this.hoveredDate = null;
+        } else {
+            this.rangeEnd = date;
+            if (this.rangeEnd < this.rangeStart) {
+                [this.rangeStart, this.rangeEnd] = [this.rangeEnd, this.rangeStart];
+            }
+            this.dateInput.value = `${this.formatDate(this.rangeStart)} – ${this.formatDate(this.rangeEnd)}`;
+            this.closeCalendar();
+        }
+        this.highlightRange();
+    }
+
+    highlightRange() {
+        const allDays = this.calender.querySelectorAll('.day');
+        allDays.forEach(dayEl => dayEl.classList.remove('range-highlight', 'range-start', 'range-end'));
+    
+        const start = this.rangeStart;
+        const end = this.rangeEnd || this.hoveredDate;
+    
+        if (!start || !end) return;
+    
+        const [min, max] = start <= end ? [start, end] : [end, start];
+
+        allDays.forEach(dayEl => {
+            const date = new Date(dayEl.dataset.date);
+            if (date >= min && date <= max) {
+                dayEl.classList.add('range-highlight');
+                if (date.getTime() === min.getTime()) dayEl.classList.add('range-start');
+                if (date.getTime() === max.getTime()) dayEl.classList.add('range-end');
+            }
+        });
+    }
+
+    formatDate(date) {
+        return `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
     }
 }
 

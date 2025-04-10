@@ -1,9 +1,10 @@
 class CategoryDropdown {
-    constructor(inputElement, dropdownElement, categories = []) {
+    constructor(inputElement, dropdownElement, categories = [], isFilterBar = false) {
         this.inputElement = inputElement;
         this.dropdownElement = dropdownElement;
         this.isOpen = false;
         this.categories = Array.isArray(categories) ? categories : [];
+        this.isFilterBar = isFilterBar;
         this.setDropdownList();
         this.attachEventListeners();
     }
@@ -37,6 +38,13 @@ class CategoryDropdown {
 
     renderCategories(categories) {
         this.dropdownElement.innerHTML = '';
+
+        if (this.isFilterBar) {
+            const allCategoriesItem = document.createElement('li');
+            allCategoriesItem.textContent = 'Alle Kategorien';
+            allCategoriesItem.setAttribute('data-category', 'all');
+            this.dropdownElement.appendChild(allCategoriesItem);
+        }
 
         if (categories.length === 0 && this.inputElement.value.trim().length === 0) {
             this.dropdownElement.innerHTML = '<li>Keine Kategorien verfügbar</li>';
@@ -74,6 +82,10 @@ class CategoryDropdown {
         if (event.target.tagName === 'LI') {
             this.inputElement.value = event.target.textContent;
             this.closeDropdown(); 
+        }
+
+        if (event.target.getAttribute('data-category') === 'all') {
+            this.inputElement.value = 'Alle Kategorien';
         }
     }
 
