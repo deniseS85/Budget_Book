@@ -39,7 +39,7 @@ class CategoryDropdown {
     renderCategories(categories) {
         this.dropdownElement.innerHTML = '';
 
-        if (this.isFilterBar) {
+        if (this.isFilterBar && this.inputElement.value !== 'Alle Kategorien') {
             const allCategoriesItem = document.createElement('li');
             allCategoriesItem.textContent = 'Alle Kategorien';
             allCategoriesItem.setAttribute('data-category', 'all');
@@ -79,13 +79,13 @@ class CategoryDropdown {
     }
 
     selectCategory(event) {
-        if (event.target.tagName === 'LI') {
-            this.inputElement.value = event.target.textContent;
-            this.closeDropdown(); 
-        }
-
-        if (event.target.getAttribute('data-category') === 'all') {
-            this.inputElement.value = 'Alle Kategorien';
+        if (event.target.tagName !== 'LI') return;
+    
+        this.inputElement.value = event.target.textContent;
+        this.closeDropdown();
+    
+        if (this.isFilterBar) {
+            this.renderCategories(this.categories);
         }
     }
 

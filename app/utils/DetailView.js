@@ -19,6 +19,7 @@ class DetailView {
         this.categories = { income: [], expense: [] }; 
         this.categoryDropdown = null;
         this.calendar = null;
+        this.filterState = {}; 
         this.attachEventListeners();
         this.attachTransactionSavedListener(); 
     }
@@ -68,9 +69,24 @@ class DetailView {
         transactionUI.setFilterButtonsImg(this.transactionType);
         this.openCategoryDropdown(this.transactionType);
         this.openDatePicker();
+        this.setFilterValues();
         this.resetFilterInputs();
+        this.addApplyFilterListener(config);
     }
 
+    setFilterValues() {
+        document.getElementById('filter-category-input').value = this.filterState.category || 'Alle Kategorien';
+        document.getElementById('filter-amount-from').value = this.filterState.amountFrom || '';
+        document.getElementById('filter-amount-to').value = this.filterState.amountTo || '';
+        if (this.filterState.date) {
+            const start = this.filterState.date.start.toLocaleDateString('de-DE');
+            const end = this.filterState.date.end.toLocaleDateString('de-DE');
+            document.getElementById('filter-date').value = `${start} – ${end}`;
+        } else {
+            document.getElementById('filter-date').value = 'Alle Daten';
+        }
+    }
+    
     resetFilterInputs() {
         const clearFilterBtn = document.getElementById('clear-filter');
         if (clearFilterBtn) {
@@ -83,6 +99,72 @@ class DetailView {
         document.getElementById('filter-amount-from').value = '';
         document.getElementById('filter-amount-to').value = '';
         document.getElementById('filter-date').value = 'Alle Daten';
+        this.filterState = {};
+        const config = transactionUI.getTransactionConfig(this.transactionType);
+        this.updateDetailViewBody(config);
+    }
+
+    addApplyFilterListener(config) {
+        const applyFilterBtn = document.getElementById('apply-filter');
+        if (applyFilterBtn) {
+            applyFilterBtn.addEventListener('click',  this.applyFilters.bind(this, config)); 
+        }
+    }
+
+    applyFilters(config) {
+        this.saveFilterState();
+
+        const categoryFilter = this.filterState.category;
+        const amountFrom = this.filterState.amountFrom;
+        const amountTo = this.filterState.amountTo;
+        const dateFilter = this.filterState.date;
+        const startDate = dateFilter ? dateFilter.start : null;
+        const endDate = dateFilter ? dateFilter.end : null;
+        this.filterState.date = dateFilter; 
+        
+        config.originalList ||= [...config.list];
+        config.list = [...config.originalList];
+
+        const filteredList = this.filterList(config.list, categoryFilter, amountFrom, amountTo, startDate, endDate);
+        config.list = filteredList;
+    
+        this.updateDetailViewBody(config);
+    }
+
+    saveFilterState() {
+        const dateRange = document.getElementById('filter-date').value || 'Alle Daten';
+        let startDate = null;
+        let endDate = null;
+
+        if (dateRange !== 'Alle Daten' && dateRange.includes('–')) {
+            const dateParts = dateRange.split('–').map(date => date.trim());
+            startDate = new Date(dateParts[0].split('.').reverse().join('-'));
+            endDate = new Date(dateParts[1].split('.').reverse().join('-'));
+        }
+
+        this.filterState = {
+            category: document.getElementById('filter-category-input').value || 'Alle Kategorien',
+            amountFrom: document.getElementById('filter-amount-from').value || '',
+            amountTo: document.getElementById('filter-amount-to').value || '',
+            date: startDate && endDate ? { start: startDate, end: endDate } : null,
+        };
+    }
+    
+    filterList(list, categoryFilter, amountFrom, amountTo, startDate, endDate) {
+        const amountFromParsed = amountFrom !== "" ? parseFloat(amountFrom) * 100 : null;
+        const amountToParsed = amountTo !== "" ? parseFloat(amountTo) * 100 : null;
+
+    
+        return list.filter(item => {
+            const categoryMatch = categoryFilter && categoryFilter !== 'Alle Kategorien' ? item.category === categoryFilter : true;
+            const amountMatch = (amountFromParsed === null || item.amount >= amountFromParsed) && (amountToParsed === null || item.amount <= amountToParsed);
+            const itemDate = new Date(item.date);
+            const dateMatch = 
+                (startDate === null || itemDate >= startDate) && 
+                (endDate === null || itemDate <= endDate);
+    
+            return categoryMatch && amountMatch && dateMatch;
+        });
     }
 
     updateCategoriesData(categories) {
@@ -91,6 +173,7 @@ class DetailView {
 
     openCategoryDropdown(type) {
         const categoryFilterInput = document.getElementById('filter-category-input');
+        categoryFilterInput.value = 'Alle Kategorien';
         const dropdownList = document.getElementById('filter-category-dropdown');
         const categories = this.categories[type] || [];
         this.categoryDropdown = new CategoryDropdown(categoryFilterInput, dropdownList, categories, true);
@@ -116,14 +199,15 @@ class DetailView {
         this.detailView.appendChild(detailsTable);
         this.detailView.scrollTop = 0;
     }
+    
 
     createFilterBar(type) {
         const filterContainer = document.createElement('div');
-
         filterContainer.classList.add('detail-view-filter');
-        filterContainer.innerHTML = /*html*/`
+
+        const filterHTML = /*html*/`
             <div class="filter-category-container">
-                <input type="text" id="filter-category-input" placeholder="Alle Kategorien" autocomplete="off">
+                <input type="text" id="filter-category-input" autocomplete="off">
                 <ul class="dropdown-list dropdown-${type}" id="filter-category-dropdown"></ul>
             </div>
 
@@ -143,21 +227,28 @@ class DetailView {
                 <button id="clear-filter"></button>
             </div>`;
 
+        filterContainer.innerHTML = filterHTML;
         this.validateAmountInput();
-
         return filterContainer;
     }
 
     validateAmountInput() {
         setTimeout(() => {
             const formValidator = new FormValidator();
-            document.getElementById('filter-amount-from').addEventListener('keydown', (event) => formValidator.validateAmountInput(event));
-            document.getElementById('filter-amount-to').addEventListener('keydown', (event) => formValidator.validateAmountInput(event));
+            const amountInputs = [
+                document.getElementById('filter-amount-from'),
+                document.getElementById('filter-amount-to')
+            ];
+    
+            amountInputs.forEach(input => {
+                input.addEventListener('keydown', (event) => formValidator.validateAmountInput(event));
+            });
         }, 0); 
     }
 
     createDetailsTable(list, type) {
         this.detailsList.classList.add('detailsList');
+    
         const groupedByMonth = this.groupByMonthYear(list);
         
         Object.entries(groupedByMonth).forEach(([key, items]) => {
@@ -174,7 +265,7 @@ class DetailView {
             detailsTable.appendChild(tbody);
             this.detailsList.appendChild(detailsTable);
         });
-    
+
         return this.detailsList;
     }
         
@@ -191,7 +282,6 @@ class DetailView {
             if (!grouped[key]) { grouped[key] = []; }
             grouped[key].push(item);
         });
-
         return grouped;
     }
 
@@ -221,6 +311,7 @@ class DetailView {
         this.addExpensesBtn.style.display = 'none';
         this.categoryDropdown?.closeDropdown();
         this.calendar?.closeCalendar();
+        this.filterState = {};
     }
 
     handleMouseOver(event) {

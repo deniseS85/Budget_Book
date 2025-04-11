@@ -158,6 +158,7 @@ class Calendar {
             this.dateInput.value = `${this.formatDate(this.rangeStart)} – ${this.formatDate(this.rangeEnd)}`;
             this.closeCalendar();
         }
+
         this.highlightRange();
     }
 
