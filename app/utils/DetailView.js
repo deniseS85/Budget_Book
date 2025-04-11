@@ -247,6 +247,7 @@ class DetailView {
     }
 
     createDetailsTable(list, type) {
+        list.length === 0 ? this.showNoResultMessage() : null;
         this.detailsList.classList.add('detailsList');
     
         const groupedByMonth = this.groupByMonthYear(list);
@@ -267,6 +268,13 @@ class DetailView {
         });
 
         return this.detailsList;
+    }
+
+    showNoResultMessage() {
+        const noResultsMessage = document.createElement('p');
+        noResultsMessage.textContent = 'Keine Ergebnisse gefunden.';
+        noResultsMessage.classList.add('no-results');
+        this.detailsList.appendChild(noResultsMessage);
     }
         
     groupByMonthYear(transactionList) {
