@@ -78,6 +78,7 @@ class DetailView {
         document.getElementById('filter-category-input').value = this.filterState.category || 'Alle Kategorien';
         document.getElementById('filter-amount-from').value = this.filterState.amountFrom || '';
         document.getElementById('filter-amount-to').value = this.filterState.amountTo || '';
+        
         if (this.filterState.date) {
             const start = this.filterState.date.start.toLocaleDateString('de-DE');
             const end = this.filterState.date.end.toLocaleDateString('de-DE');
@@ -173,7 +174,7 @@ class DetailView {
 
     openCategoryDropdown(type) {
         const categoryFilterInput = document.getElementById('filter-category-input');
-        categoryFilterInput.value = 'Alle Kategorien';
+        categoryFilterInput.value = this.filterState.category || 'Alle Kategorien';
         const dropdownList = document.getElementById('filter-category-dropdown');
         const categories = this.categories[type] || [];
         this.categoryDropdown = new CategoryDropdown(categoryFilterInput, dropdownList, categories, true);

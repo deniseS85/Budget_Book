@@ -334,7 +334,7 @@ td:last-child {
     outline: none;
     color: var(--fontColor);
     height: 35px;
-    width: 160px;
+    width: 235px;
     cursor: pointer;
     transition: box-shadow 0.2s ease;
 }
@@ -364,10 +364,7 @@ td:last-child {
 
 #filter-category-input.open-dropdown:hover {
     background: var(--transaction-color);
-}
-
-#filter-category-input.open-dropdown:hover::placeholder {
-    color: var(--transaction-font-color);
+    color: var(--transaction-font-color)
 }
 
 #filter-category-input.close-dropdown:hover::placeholder {
@@ -410,7 +407,7 @@ td:last-child {
 }
 
 .filter-amount-container input {
-    width: 100px;
+    width: 135px;
 }
 
 .filter-calendar-container {
@@ -419,7 +416,7 @@ td:last-child {
 }
 
 #filter-date {
-    width: 180px;
+    width: 235px;
 }
 
 #filter-date:focus {
@@ -448,11 +445,10 @@ td:last-child {
     display: flex;
     height: 35px;
     gap: 10px;
-    margin-left: 40px;
 }
 
 .filter-btn-container  button {
-    width: 40px;
+    width: 100px;
     background-color: var(--transaction-color);
     border: none;
     border-radius: 5px;
