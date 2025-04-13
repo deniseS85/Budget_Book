@@ -10,7 +10,7 @@ class Dashboard {
         /* ################################################# */
                     /* TEST */
         /* ################################################# */
-        //logTransactionTable(incomeList, expenseList);
+        //this.logTransactionTable(incomeList, expenseList);
     }
 
     calculateAverage(list, isYearly) {
@@ -155,10 +155,10 @@ class Dashboard {
                 Kategorie: category,
                 "Ø Monat": (amount / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
                 "Ø Jahr": (yearlyAmount / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
-                "Gesamt Einnahmen aktueller Monat": (incomeCurrentMonth / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
-                "Gesamt Ausgaben aktueller Monat": (expenseCurrentMonth / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
-                "Gesamt Einnahmen aktuelles Jahr": (incomeCurrentYear / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
-                "Gesamt Ausgaben aktuelles Jahr": (expenseCurrentYear / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })
+                "Gesamt Einnahmen Monat": (incomeCurrentMonth / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
+                "Gesamt Ausgaben Monat": (expenseCurrentMonth / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
+                "Gesamt Einnahmen Jahr": (incomeCurrentYear / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
+                "Gesamt Ausgaben Jahr": (expenseCurrentYear / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })
             };
         });
 

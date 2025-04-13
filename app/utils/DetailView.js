@@ -122,7 +122,7 @@ class DetailView {
         const startDate = dateFilter ? dateFilter.start : null;
         const endDate = dateFilter ? dateFilter.end : null;
         this.filterState.date = dateFilter; 
-        
+    
         config.originalList ||= [...config.list];
         config.list = [...config.originalList];
 
@@ -130,6 +130,20 @@ class DetailView {
         config.list = filteredList;
     
         this.updateDetailViewBody(config);
+        this.getFilterListSum(filteredList);
+    }
+
+    getFilterListSum(filteredList) {
+        const totalAmount = filteredList.reduce((sum, item) => {
+            return sum + (item.amount || 0); 
+        }, 0);
+
+        const formattedTotalAmount = (totalAmount / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const sumElement = document.getElementById('filter-sum');
+        sumElement.textContent = `${formattedTotalAmount} €`;
+        sumElement.parentElement.classList.add('visible');
+        
+        console.log('Summe der gefilterten Beträge:', `Σ ${formattedTotalAmount} €`);
     }
 
     saveFilterState() {
@@ -226,6 +240,11 @@ class DetailView {
             <div class="filter-btn-container">
                 <button id="apply-filter"></button>
                 <button id="clear-filter"></button>
+            </div>
+            
+            <div class="filter-sum-container">
+                <span id="sum-symbol">Σ</span>
+                <span id="filter-sum"></span>
             </div>`;
 
         filterContainer.innerHTML = filterHTML;

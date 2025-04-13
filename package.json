@@ -20,5 +20,8 @@
     "mac": {
       "target": "zip"
     }
+  },
+  "dependencies": {
+    "chart.js": "^4.4.8"
   }
 }

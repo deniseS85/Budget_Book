@@ -87,7 +87,7 @@ body {
 }
 
 .period-slider {
-    height: 50px;
+    height: 60px;
     background-color: var(--itemColor);
     border-radius: 10px;
     display: flex;
@@ -464,6 +464,38 @@ td:last-child {
     width: 20px; 
     object-fit: contain;
     vertical-align: middle;
+}
+
+.filter-sum-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 35px;
+    position: absolute;
+    right: 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: var(--itemColor);
+    border: 1px solid var(--transaction-color);
+    outline: none;
+    color: var(--fontColor);
+    height: 35px;
+    width: 130px;
+}
+
+.filter-sum-container.visible {
+    opacity: 1;
+}
+
+#sum-symbol {
+    color: var(--transaction-color);
+    font-size: 20px;
+}
+
+#filter-sum {
+    font-size: 15px;
 }
 
 .no-results {
@@ -865,21 +897,28 @@ td:last-child {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px 10px;
+    padding: 12px 10px;
     background-color: var(--itemColor);
     border-radius: 10px;
 }
 
 .center {
     flex-grow: 1;
+    height: calc(100% - 80px);
+    align-items: flex-start;
 }
+
+#diagram {
+    width: 100%;
+    height: 100%; 
+    max-height: 100%;
+    max-width: 100%;
+    display: block;
+} 
 
 .right {
     flex-grow: 0;
     flex-basis: 250px;
-
-    /* wieder löschen !!!  */
-    display: none;
 }
 
 .payment-method-container {
