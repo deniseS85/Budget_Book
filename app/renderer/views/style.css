@@ -906,6 +906,7 @@ td:last-child {
     flex-grow: 1;
     height: calc(100% - 80px);
     align-items: flex-start;
+    padding: 10px;
 }
 
 #diagram {

@@ -1,9 +1,12 @@
 const { Chart, LinearScale, CategoryScale, BarElement, Title, Tooltip, Legend, BarController } = require('chart.js');
 Chart.register(LinearScale, CategoryScale, BarElement, Title, Tooltip, Legend, BarController);
+const DetailView = require('../utils/DetailView');
 
 class Diagram {
-    constructor() {
+    constructor(transactionModal) {
         this.chart = null;
+        this.detailView = new DetailView(transactionModal);
+        this.categories = { income: [], expense: [] }; 
     }
 
     createChart(canvasId, incomeList, expenseList) {
@@ -76,35 +79,75 @@ class Diagram {
         });
     }
 
-    handleBarClick(event, array, incomeList, expenseList) {
-        if (array.length) {
-            const monthYear = this.chart.data.labels[array[0].index];
-            const [month, year] = monthYear.split("'");
-            const selectedMonthStart = new Date(`${month} 1, 20${year}`);
-            const selectedMonthEnd = new Date(selectedMonthStart);
-            selectedMonthEnd.setMonth(selectedMonthStart.getMonth() + 1);
-            selectedMonthEnd.setDate(0); 
-
-            const datasetIndex = array[0].datasetIndex;
-            const type = this.chart.data.datasets[datasetIndex].label;
-
-            if (type === 'Einnahmen') {
-                this.filterTransactionsByMonthAndType(selectedMonthStart, selectedMonthEnd, incomeList);
-            } else if (type === 'Ausgaben') {
-                this.filterTransactionsByMonthAndType(selectedMonthStart, selectedMonthEnd, expenseList);
-            }
-        }
+    updateCategoriesData(categories) {
+        this.categories = categories;
     }
 
+    handleBarClick(event, array, incomeList, expenseList) {
+        if (!array.length) return;
+    
+        const label = this.chart.data.labels[array[0].index];
+        const dateRange = this.parseMonthYearLabel(label);
+        if (!dateRange) return;
+    
+        const datasetIndex = array[0].datasetIndex;
+        const typeLabel = this.chart.data.datasets[datasetIndex].label;
+        const type = this.getTransactionTypeFromLabel(typeLabel);
+        if (!type) return;
+    
+        const listToFilter = this.getFilteredListByType(type, incomeList, expenseList);
+        this.filterTransactionsByMonthAndType(dateRange.start, dateRange.end, listToFilter);
+    
+        this.detailView.updateCategoriesData({
+            income: this.categories.income,
+            expense: this.categories.expense
+        });
+    
+        this.detailView.openDetailView(type, true, dateRange);
+    }
+    
+
+    parseMonthYearLabel(label) {
+        const [month, year] = label.split("'");
+        const germanToEnglishMonths = {
+            "Jan": "Jan", "Feb": "Feb", "Mär": "Mar", "Apr": "Apr",
+            "Mai": "May", "Jun": "Jun", "Jul": "Jul", "Aug": "Aug",
+            "Sep": "Sep", "Okt": "Oct", "Nov": "Nov", "Dez": "Dec"
+        };
+    
+        const englishMonth = germanToEnglishMonths[month];
+        if (!englishMonth) {
+            console.error('Unbekannter Monat:', month);
+            return null;
+        }
+    
+        const start = new Date(`${englishMonth} 1, 20${year}`);
+        const end = new Date(start);
+        end.setMonth(start.getMonth() + 1);
+        end.setDate(0);
+        return { start, end };
+    }
+    
+    getTransactionTypeFromLabel(label) {
+        const typeMap = {
+            'Einnahmen': 'income',
+            'Ausgaben': 'expense'
+        };
+        return typeMap[label] || null;
+    }
+    
+    getFilteredListByType(type, incomeList, expenseList) {
+        return type === 'income' ? incomeList : expenseList;
+    }
+    
+
     filterTransactionsByMonthAndType(startDate, endDate, dataList) {
-        const filteredTransactions = dataList.filter(item => {
+        return dataList.filter(item => {
             const transactionDate = new Date(item.date);
             return transactionDate >= startDate && transactionDate <= endDate;
         });
-    
-        console.log('Filtered Transactions:', filteredTransactions);
     }
-    
+
     prepareChartData(list) {
         const allMonths = [
             "Jan'24", "Feb'24", "Mär'24", "Apr'24", "Mai'24", "Jun'24",
@@ -118,20 +161,29 @@ class Diagram {
         }, {});
 
         list.forEach(({ category, amount, date }) => {
-            const month = new Date(date).toLocaleString('de-DE', { month: 'short' });
-            const year = new Date(date).getFullYear().toString().slice(-2);
-            const monthYear = `${month}'${year}`;
-            
+            const transactionDate = new Date(date);
+            const monthYear = `${transactionDate.toLocaleString('de-DE', { month: 'short' })}'${transactionDate.getFullYear().toString().slice(-2)}`;
             if (data[monthYear] !== undefined) {
                 data[monthYear] += amount;
             }
         });
+    
+        return {
+            labels: Object.keys(data),
+            amounts: Object.values(data)
+        };
+    }
 
-        const labels = Object.keys(data);
-        const amounts = Object.values(data);
-
-        return { labels, amounts };
-
+    updateChartData(incomeList, expenseList) {
+        const incomeData = this.prepareChartData(incomeList);
+        const expenseData = this.prepareChartData(expenseList);
+    
+        if (!this.chart) return;
+    
+        this.chart.data.labels = incomeData.labels;
+        this.chart.data.datasets[0].data = incomeData.amounts;
+        this.chart.data.datasets[1].data = expenseData.amounts;
+        this.chart.update();
     }
 }
 
