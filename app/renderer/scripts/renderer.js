@@ -40,21 +40,9 @@ ipcRenderer.on('load-data-response', (event, data) => {
     const incomeCategories = [...new Set(incomeList.map(item => item.category))];
     const expenseCategories = [...new Set(expenseList.map(item => item.category))];
 
-    transactionModal.updateCategoriesData({
-        income: incomeCategories,
-        expense: expenseCategories
-    });
-
-    detailView.updateCategoriesData({
-        income: incomeCategories,
-        expense: expenseCategories
-    });
-
-    diagram.updateCategoriesData({
-        income: incomeCategories,
-        expense: expenseCategories
-    });
-
+    transactionModal.updateCategoriesData({ income: incomeCategories, expense: expenseCategories });
+    detailView.updateCategoriesData({ income: incomeCategories, expense: expenseCategories });
+    diagram.updateCategoriesData({ income: incomeCategories, expense: expenseCategories });
     diagram.createChart('diagram', incomeList, expenseList);
 
 });

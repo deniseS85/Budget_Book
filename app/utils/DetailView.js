@@ -43,15 +43,10 @@ class DetailView {
         const { start = null, end = null } = dateStartEnd;
         this.transactionType = type;
         const config = transactionUI.getTransactionConfig(this.transactionType);
-        if (start && end) {
-            config.date = { start, end };
-        }
+        start && end && (config.date = { start, end });
         this.updateDetailViewHeader(config);
         this.updateDetailViewBody(config);
-
-        if (fromDiagram) {
-            this.applyFilters(config);
-        }
+        fromDiagram && this.applyFilters(config);
         this.transactionWindow.classList.add('visible');
     }
 
@@ -122,14 +117,12 @@ class DetailView {
 
     applyFilters(config) {
         this.saveFilterState();
-    
         const categoryFilter = this.filterState.category;
         const amountFrom = this.filterState.amountFrom;
         const amountTo = this.filterState.amountTo;
-    
-        const startDate = config.date?.start || this.filterState.date?.start || null;
-        const endDate = config.date?.end || this.filterState.date?.end || null;
-    
+        const startDate = this.filterState.date?.start || config.date?.start || null;
+        const endDate = this.filterState.date?.end || config.date?.end || null;
+        
         this.filterState.date = { start: startDate, end: endDate };
     
         config.originalList ||= [...config.list];
@@ -149,7 +142,6 @@ class DetailView {
         this.updateDetailViewBody(config);
         this.getFilterListSum(filteredList);
     }
-    
 
     getFilterListSum(filteredList) {
         const totalAmount = filteredList.reduce((sum, item) => {
@@ -160,8 +152,6 @@ class DetailView {
         const sumElement = document.getElementById('filter-sum');
         sumElement.textContent = `${formattedTotalAmount} €`;
         sumElement.parentElement.classList.add('visible');
-        
-       /*  console.log('Summe der gefilterten Beträge:', `Σ ${formattedTotalAmount} €`); */
     }
 
     saveFilterState() {
@@ -187,7 +177,6 @@ class DetailView {
         const amountFromParsed = amountFrom !== "" ? parseFloat(amountFrom) * 100 : null;
         const amountToParsed = amountTo !== "" ? parseFloat(amountTo) * 100 : null;
 
-    
         return list.filter(item => {
             const categoryMatch = categoryFilter && categoryFilter !== 'Alle Kategorien' ? item.category === categoryFilter : true;
             const amountMatch = (amountFromParsed === null || item.amount >= amountFromParsed) && (amountToParsed === null || item.amount <= amountToParsed);
