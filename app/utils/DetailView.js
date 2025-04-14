@@ -82,7 +82,7 @@ class DetailView {
         document.getElementById('filter-amount-from').value = this.filterState.amountFrom || '';
         document.getElementById('filter-amount-to').value = this.filterState.amountTo || '';
         
-        if (this.filterState.date) {
+        if (this.filterState.date && this.filterState.date.start && this.filterState.date.end) {
             const start = this.filterState.date.start.toLocaleDateString('de-DE');
             const end = this.filterState.date.end.toLocaleDateString('de-DE');
             document.getElementById('filter-date').value = `${start} – ${end}`;
