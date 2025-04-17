@@ -65,6 +65,10 @@ class TransactionModal {
         this.diagram = diagram;
     }
 
+    setCategoryDiagramInstanse(categoryDiagram) {
+        this.categoryDiagram = categoryDiagram;
+    }
+
     openDatePicker() {
         const today = new Date();
         const dateInput = document.getElementById('date');
@@ -122,6 +126,7 @@ class TransactionModal {
             this.addTransactionToList(this.transactionType, newTransactionData);
             dashboard.updateTransactionView(isYearly);
             this.diagram?.updateChartData(incomeList, expenseList);
+            this.categoryDiagram?.updateChartData(incomeList, expenseList);
             this.clearForm();
             this.toggleModal(false);
             this.categoryDropdown.setDropdownList();

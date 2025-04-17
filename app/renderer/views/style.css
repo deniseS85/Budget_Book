@@ -927,7 +927,6 @@ td:last-child {
     justify-content: space-around;
 }
 
-
 .right {
     flex-grow: 0;
     flex-basis: 300px;

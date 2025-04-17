@@ -23,10 +23,11 @@ const transactionModal = new TransactionModal(
 );
 
 const diagram = new Diagram(transactionModal);
-const categoryDiagram = new CategoryDiagram();
+const categoryDiagram = new CategoryDiagram(transactionModal);
 const detailView = new DetailView(transactionModal);
 
 transactionModal.setDiagramInstance(diagram); 
+transactionModal.setCategoryDiagramInstanse(categoryDiagram);
 
 document.getElementById('income-box').addEventListener('click', () => detailView.openDetailView('income'));
 document.getElementById('expenses-box').addEventListener('click', () => detailView.openDetailView('expense'));
@@ -46,8 +47,8 @@ ipcRenderer.on('load-data-response', (event, data) => {
     detailView.updateCategoriesData({ income: incomeCategories, expense: expenseCategories });
     diagram.updateCategoriesData({ income: incomeCategories, expense: expenseCategories });
     diagram.createChart('diagram', incomeList, expenseList);
+    categoryDiagram.updateCategoriesData({ income: incomeCategories, expense: expenseCategories });
     categoryDiagram.createChart('category-diagram-income', 'category-diagram-expense', incomeList, expenseList); 
-
 });
 
 document.getElementById('toggle').addEventListener('change', () => {

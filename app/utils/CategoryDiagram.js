@@ -42,47 +42,6 @@ class CategoryDiagram {
         const values = labels.map(label => data[label]); 
         const colors = this.generateCategoryColors(labels.length, chartType);
 
-        const doughnutLabelsLine = {
-            id: 'doughnutLabelsLine',
-            afterDraw(chart) {
-                const {ctx, chartArea: { width, height }} = chart; 
-                
-                chart.data.datasets.forEach((dataset, i) => {
-                    const total = dataset.data.reduce((a, b) => a + b, 0);
-
-                    chart.getDatasetMeta(i).data.forEach((datapoint, index) => {
-                        const value = dataset.data[index];
-                        const percent = (value / total) * 100;
-
-                        if (percent >= 5) return; 
-                        
-                        const { x, y } = datapoint.tooltipPosition();
-                        const halfwidth = width / 2;
-                        const halfheight = height / 2;
-                        const xLine = x >= halfwidth ? x + 10 : x - 10; 
-                        const yLine = y >= halfheight ? y + 50 : y - 50; 
-                        const extraLine = x >= halfwidth ? 30 : -30;
-
-                        ctx.beginPath();
-                        ctx.moveTo(x, y);
-                        ctx.lineTo(xLine, yLine);
-                        ctx.lineTo(xLine + extraLine, yLine);
-                        ctx.strokeStyle = fontColor;
-                        ctx.stroke();
-                        ctx.font = '12px Arial';
-
-                        const textXPosition = x >= halfwidth ? 'left' : 'right';
-                        const plusFivePx = x >= halfwidth ? 5 : -5;
-                        ctx.textAlign = textXPosition;
-                        ctx.fillStyle = fontColor;
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(chart.data.labels[index], xLine + extraLine + plusFivePx, yLine - 8);
-                        ctx.fillText(`${percent.toFixed(1)}%`, xLine + extraLine + plusFivePx, yLine + 8);
-                    })
-                })
-            }
-        }
-
         return new Chart(ctx, {
             type: 'doughnut',
             data: {
@@ -103,9 +62,6 @@ class CategoryDiagram {
                         formatter: (value, context) => {
                             const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                             const percent = (value / total) * 100;
-            
-                            if (percent < 5) return '';
-            
                             const label = context.chart.data.labels[context.dataIndex];
                             return `${label}\n${percent.toFixed(1)}%`;
                         },
@@ -119,18 +75,29 @@ class CategoryDiagram {
                 elements: {
                     arc: {
                         borderWidth: 0,
-                        hoverOffset: 10
+                        hoverOffset: 15
                     }
                 },
                 layout: { padding: 20 }
-            },
-            plugins: [doughnutLabelsLine]
+            }
         });
     }
 
     getCategoryData(list) {
+        const categoryMap = {
+            'Hausrat': 'Versicherung',
+            'Allianz': 'Versicherung',
+            'Apple': 'Sonstiges',
+            'Steuern': 'Sonstiges',
+            'Kreditkartengebühr': 'Sonstiges',
+            'Strom': 'Nebenkosten',
+            'Wasser': 'Nebenkosten',
+            'Katzenbedarf': 'Katzen'
+        };
+
         return list.reduce((acc, item) => {
-            acc[item.category] = (acc[item.category] || 0) + item.amount;
+            const mappedCategory = categoryMap[item.category] || item.category;
+            acc[mappedCategory] = (acc[mappedCategory] || 0) + item.amount;
             return acc;
         }, {});
     }
@@ -152,6 +119,10 @@ class CategoryDiagram {
         }
         return colors;
     }
+
+    updateCategoriesData(categories) {
+        this.categories = categories;
+    }
     
     updateChartData(incomeList, expenseList) {
         this.renderChartData(this.incomeChart, incomeList);
@@ -159,13 +130,14 @@ class CategoryDiagram {
     }
 
     renderChartData(chart, list) {
-        if (chart) {
-            const data = this.getCategoryData(list);
-            chart.data.labels = Object.keys(data);
-            chart.data.datasets[0].backgroundColor = this.generateCategoryColors(Object.keys(data).length);
-            chart.data.datasets[0].data = Object.values(data);
-            chart.update();
-        }
+        if (!this.chart) return;
+
+        const data = this.getCategoryData(list);
+        chart.data.labels = Object.keys(data);
+        chart.data.datasets[0].backgroundColor = this.generateCategoryColors(Object.keys(data).length);
+        chart.data.datasets[0].data = Object.values(data);
+        chart.update();
+        
     }
 }
 
