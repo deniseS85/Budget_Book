@@ -132,33 +132,20 @@ class Dashboard {
         this.renderList('expenses', expenseList, append);
     }
 
-
-
 /* ################################################# */
                 /* TEST */
 /* ################################################# */
     logTransactionTable() {
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth() + 1;
         const incomeAverages = this.calculateAverage(incomeList, false);
         const expenseAverages = this.calculateAverage(expenseList, false);
         const incomeYearly = this.calculateAverage(incomeList, true);
         const expenseYearly = this.calculateAverage(expenseList, true);
-        const incomeCurrentYear = this.getCurrentDateAmount(true, currentMonth, currentYear, incomeList, true);
-        const expenseCurrentYear = this.getCurrentDateAmount(true, currentMonth, currentYear, expenseList, true);
-        const incomeCurrentMonth = this.getCurrentDateAmount(false, currentMonth, currentYear, incomeList, true);
-        const expenseCurrentMonth = this.getCurrentDateAmount(false, currentMonth, currentYear, expenseList, true);
         const data = [...incomeAverages, ...expenseAverages].map(({ category, amount }) => {
             const yearlyAmount = incomeYearly.concat(expenseYearly).find(entry => entry.category === category)?.amount || 0;
             return {
                 Kategorie: category,
                 "Ø Monat": (amount / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
-                "Ø Jahr": (yearlyAmount / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
-                "Gesamt Einnahmen Monat": (incomeCurrentMonth / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
-                "Gesamt Ausgaben Monat": (expenseCurrentMonth / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
-                "Gesamt Einnahmen Jahr": (incomeCurrentYear / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
-                "Gesamt Ausgaben Jahr": (expenseCurrentYear / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })
+                "Ø Jahr": (yearlyAmount / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })
             };
         });
 

@@ -8,6 +8,7 @@ const DetailView = require('../../utils/DetailView');
 const TransactionManager = require('../../utils/TransactionManager');
 const transactionManager = new TransactionManager();
 const Diagram = require('../../utils/Diagram');
+const CategoryDiagram = require('../../utils/CategoryDiagram');
 
 window.onload = () => { ipcRenderer.send('load-data'); };
 
@@ -22,6 +23,7 @@ const transactionModal = new TransactionModal(
 );
 
 const diagram = new Diagram(transactionModal);
+const categoryDiagram = new CategoryDiagram();
 const detailView = new DetailView(transactionModal);
 
 transactionModal.setDiagramInstance(diagram); 
@@ -44,6 +46,7 @@ ipcRenderer.on('load-data-response', (event, data) => {
     detailView.updateCategoriesData({ income: incomeCategories, expense: expenseCategories });
     diagram.updateCategoriesData({ income: incomeCategories, expense: expenseCategories });
     diagram.createChart('diagram', incomeList, expenseList);
+    categoryDiagram.createChart('category-diagram-income', 'category-diagram-expense', incomeList, expenseList); 
 
 });
 

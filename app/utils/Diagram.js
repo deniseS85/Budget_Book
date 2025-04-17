@@ -2,6 +2,10 @@ const { Chart, LinearScale, CategoryScale, BarElement, Title, Tooltip, Legend, B
 Chart.register(LinearScale, CategoryScale, BarElement, Title, Tooltip, Legend, BarController);
 const DetailView = require('../utils/DetailView');
 
+const turquise = getComputedStyle(document.documentElement).getPropertyValue('--turquise').trim();
+const purple = getComputedStyle(document.documentElement).getPropertyValue('--purple').trim();
+const fontColor = getComputedStyle(document.documentElement).getPropertyValue('--fontColor').trim();
+
 class Diagram {
     constructor(transactionModal) {
         this.chart = null;
@@ -13,11 +17,8 @@ class Diagram {
         const incomeData = this.prepareChartData(incomeList);
         const expenseData = this.prepareChartData(expenseList);
         const ctx = document.getElementById(canvasId).getContext('2d');
-        const turquise = getComputedStyle(document.documentElement).getPropertyValue('--turquise').trim();
-        const purple = getComputedStyle(document.documentElement).getPropertyValue('--purple').trim();
-        const fontColor = getComputedStyle(document.documentElement).getPropertyValue('--fontColor').trim();
         
-        this.chart ? this.chart.destroy() : null;
+        this.chart?.destroy();
 
         this.chart = new Chart(ctx, {
             type: 'bar',
@@ -38,6 +39,7 @@ class Diagram {
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: true,
                 onClick: (event, array) => this.handleBarClick(event, array, incomeList, expenseList),
                 scales: {
                     y: {
@@ -45,16 +47,14 @@ class Diagram {
                         ticks: {
                             callback: function(value) {
                                 return (value / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
-                            }
+                            },
+                            color: fontColor
                         },
-                        grid: {
-                            display: false
-                        }
+                        grid: { display: false }
                     },
                     x: {
-                        grid: {
-                            display: false
-                        }
+                        ticks: { color: fontColor },
+                        grid: { display: false }
                     }
                 },
                 plugins: {
@@ -69,11 +69,10 @@ class Diagram {
                     legend: {
                         labels: {
                             color: fontColor,
-                            font: {
-                                size: 16
-                            }
+                            font: { size: 16 }
                         }
-                    }
+                    },
+                    datalabels: { display: false }
                 }
             }
         });
