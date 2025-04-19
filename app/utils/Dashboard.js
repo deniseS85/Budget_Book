@@ -10,11 +10,19 @@ class Dashboard {
         /* ################################################# */
                     /* TEST */
         /* ################################################# */
-        //this.logTransactionTable(incomeList, expenseList);
+        this.logTransactionTable(incomeList, expenseList);
     }
 
     calculateAverage(list, isYearly) {
-        let data = {};
+        let data = this.processData(list);
+
+        return Object.entries(data).map(([category, entry]) => {
+            return this.averagesForCategory(category, entry, isYearly);
+        });
+    }
+
+    processData(list) {
+        const data = {};
 
         for (const { category, amount, date } of list) {
             const dateObj = new Date(date);
@@ -33,18 +41,30 @@ class Dashboard {
             entry.first = entry.first < dateObj ? entry.first : dateObj;
             entry.last = entry.last > dateObj ? entry.last : dateObj;
         }
+        return data;
+    }
 
-        return Object.entries(data).map(([category, entry]) => {
-            const totalMonths = entry.months.size;
+    averagesForCategory(category, entry, isYearly) {
+        const totalMonths = entry.months.size;
+        const totalYears = entry.years.size;
+        const isYearlyPayment = entry.count === entry.years.size;
+        let monthlyAverage;
+        let yearlyAverage;
 
-            const isYearlyPayment = entry.count === entry.years.size;
-            const monthlyAverage = isYearlyPayment ? entry.total / 12 : entry.total / totalMonths;
+        monthlyAverage = entry.total / Math.max(totalMonths, 12);  
 
-            return {
-                amount: isYearly ? monthlyAverage * 12 : monthlyAverage,
-                category
-            };
-        });
+        if (isYearlyPayment) {
+            yearlyAverage = entry.total / totalYears;
+            monthlyAverage = yearlyAverage / 12;
+        } else {
+            yearlyAverage = totalYears > 1 && totalMonths < 12
+                ? (monthlyAverage * 12) / totalYears
+                : monthlyAverage * 12;
+        }    
+        return {
+            amount: isYearly ? yearlyAverage : monthlyAverage,
+            category
+        };  
     }
 
     groupByCategory(list) {
@@ -140,15 +160,53 @@ class Dashboard {
         const expenseAverages = this.calculateAverage(expenseList, false);
         const incomeYearly = this.calculateAverage(incomeList, true);
         const expenseYearly = this.calculateAverage(expenseList, true);
+
+        const allEntries = [...incomeList, ...expenseList];
+
+        const groupedByCategory = allEntries.reduce((acc, entry) => {
+            if (!acc[entry.category]) acc[entry.category] = [];
+            acc[entry.category].push(entry);
+            return acc;
+        }, {});
+
+        const detectSinglePaymentsByYear = (entries) => {
+            const years = {};
+            entries.forEach(entry => {
+                const year = new Date(entry.date).getFullYear();
+                years[year] = (years[year] || 0) + 1;
+            });
+            return Object.values(years).every(count => count === 1);
+        };
+
         const data = [...incomeAverages, ...expenseAverages].map(({ category, amount }) => {
             const yearlyAmount = incomeYearly.concat(expenseYearly).find(entry => entry.category === category)?.amount || 0;
+
+            const entries = groupedByCategory[category] || [];
+            
+            const monthsSet = new Set(entries.map(entry => {
+                const d = new Date(entry.date);
+                return `${d.getFullYear()}-${d.getMonth() + 1}`;
+            }));
+
+            const isOncePerYear = detectSinglePaymentsByYear(entries);
+
+            const paymentType = isOncePerYear
+                ? "Einmalzahlung"
+                : (monthsSet.size === entries.length ? "Regelmäßig" : "Unregelmäßig");
+
+            const totalAmount = entries.reduce((sum, e) => sum + e.amount, 0);
+
             return {
                 Kategorie: category,
                 "Ø Monat": (amount / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
-                "Ø Jahr": (yearlyAmount / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })
+                "Ø Jahr": (yearlyAmount / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
+                "Summe Einträge": (totalAmount / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' }),
+                "Anzahl Einträge": entries.length,
+                "Anzahl Monate": monthsSet.size,
+                "Typ": paymentType
             };
         });
-
+    
         console.table(data);
     }
 }
