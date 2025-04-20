@@ -11,6 +11,12 @@ class Diagram {
         this.chart = null;
         this.detailView = new DetailView(transactionModal);
         this.categories = { income: [], expense: [] }; 
+        this.monthOffset = 0;
+
+        this.nextButton = document.getElementById('nextMonth');
+        this.prevButton = document.getElementById('prevMonth');
+        this.nextButton.style.visibility = 'hidden';
+        this.prevButton.style.visibility = 'visible';
     }
 
     createChart(canvasId, incomeList, expenseList) {
@@ -78,6 +84,56 @@ class Diagram {
         });
     }
 
+    getRollingMonths(offset = 0) {
+        const currentDate = new Date();
+        currentDate.setMonth(currentDate.getMonth() + offset);
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        const months = [];
+
+        for (let i = 0; i < 13; i++) {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            const label = `${currentDate.toLocaleString('de-DE', { month: 'short' })}'${currentDate.getFullYear().toString().slice(-2)}`;
+            months.unshift(label);
+        }
+
+        return months;
+    }
+
+    getEarliestDate(incomeList, expenseList) {
+        const allTransactions = [...incomeList, ...expenseList];
+
+        const earliestTransaction = allTransactions.reduce((earliest, transaction) => {
+            const transactionDate = new Date(transaction.date);
+            return transactionDate < earliest ? transactionDate : earliest;
+        }, new Date());
+
+        return earliestTransaction;
+    }
+
+    prevMonth(incomeList, expenseList) {
+        this.monthOffset -= 1;
+        const earliestDate = this.getEarliestDate(incomeList, expenseList);
+        const months = this.getRollingMonths(this.monthOffset);
+        const firstDisplayedMonth = months[0];
+        const formattedEarliestDate = `${earliestDate.toLocaleString('de-DE', { month: 'short' })}'${earliestDate.getFullYear().toString().slice(-2)}`;
+        this.updateChartData(incomeList, expenseList);
+        this.prevButton.style.display = (firstDisplayedMonth === formattedEarliestDate) ? 'none' : 'block';
+        this.nextButton.style.visibility = (this.monthOffset === 0) ? 'hidden' : 'visible';
+    }
+    
+    nextMonth(incomeList, expenseList) {
+        if (this.monthOffset < 0) {
+            this.monthOffset += 1;
+            const earliestDate = this.getEarliestDate(incomeList, expenseList);
+            const months = this.getRollingMonths(this.monthOffset);
+            const firstDisplayedMonth = months[0];
+            const formattedEarliestDate = `${earliestDate.toLocaleString('de-DE', { month: 'short' })}'${earliestDate.getFullYear().toString().slice(-2)}`;
+            this.prevButton.style.display = (firstDisplayedMonth === formattedEarliestDate) ? 'none' : 'block';
+            this.nextButton.style.visibility = (this.monthOffset === 0) ? 'hidden' : 'visible';
+            this.updateChartData(incomeList, expenseList);
+        }
+    }
+    
     updateCategoriesData(categories) {
         this.categories = categories;
     }
@@ -148,11 +204,13 @@ class Diagram {
     }
 
     prepareChartData(list) {
-        const allMonths = [
+       /*  const allMonths = [
             "Jan'24", "Feb'24", "Mär'24", "Apr'24", "Mai'24", "Jun'24",
             "Jul'24", "Aug'24", "Sep'24", "Okt'24", "Nov'24", "Dez'24",
             "Jan'25", "Feb'25", "Mär'25", "Apr'25"
-        ];
+        ]; */
+
+        const allMonths = this.getRollingMonths(this.monthOffset);
 
         const data = allMonths.reduce((acc, month) => {
             acc[month] = 0;

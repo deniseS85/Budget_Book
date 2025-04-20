@@ -32,6 +32,11 @@ transactionModal.setCategoryDiagramInstanse(categoryDiagram);
 document.getElementById('income-box').addEventListener('click', () => detailView.openDetailView('income'));
 document.getElementById('expenses-box').addEventListener('click', () => detailView.openDetailView('expense'));
 
+document.getElementById('toggle').addEventListener('change', () => { dashboard.updateTransactionView(document.getElementById('toggle').checked); });
+
+document.getElementById('prevMonth').addEventListener('click', () => { diagram.prevMonth(incomeList, expenseList); });
+document.getElementById('nextMonth').addEventListener('click', () => { diagram.nextMonth(incomeList, expenseList); });
+
 ipcRenderer.on('load-data-response', (event, data) => {
     incomeList = data.income.map(item => new Income(item.date, item.category, item.amount, item.paymentMethod));
     expenseList = data.expenses.map(item => new Expense(item.date, item.category, item.amount, item.paymentMethod));
@@ -49,8 +54,4 @@ ipcRenderer.on('load-data-response', (event, data) => {
     diagram.createChart('diagram', incomeList, expenseList);
     categoryDiagram.updateCategoriesData({ income: incomeCategories, expense: expenseCategories });
     categoryDiagram.createChart('category-diagram-income', 'category-diagram-expense', incomeList, expenseList); 
-});
-
-document.getElementById('toggle').addEventListener('change', () => {
-    dashboard.updateTransactionView(document.getElementById('toggle').checked);
 });

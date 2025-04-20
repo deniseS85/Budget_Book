@@ -917,6 +917,34 @@ td:last-child {
     justify-content: center;
     display: flex;
     align-items: center;
+    position: relative;
+}
+
+.diagram-container button {
+    border: none;
+    background-color: transparent;
+    position: absolute;
+    display: flex;
+    align-items: center;
+}
+
+.diagram-container button img {
+    width: 25px;
+    object-fit: contain;
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.diagram-container button img:hover {
+    transform: scale(1.2);
+}
+
+#prevMonth {
+    left: -5px;
+}
+
+#nextMonth {
+    right: -5px;
 }
 
 .category-diagram-container {

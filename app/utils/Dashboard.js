@@ -10,7 +10,7 @@ class Dashboard {
         /* ################################################# */
                     /* TEST */
         /* ################################################# */
-        this.logTransactionTable(incomeList, expenseList);
+        //this.logTransactionTable(incomeList, expenseList);
     }
 
     calculateAverage(list, isYearly) {

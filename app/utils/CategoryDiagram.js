@@ -59,15 +59,11 @@ class CategoryDiagram {
                     datalabels: {
                         color: fontColor,
                         font: { size: 12 },
-                        formatter: (value, context) => {
-                            const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                            const percent = (value / total) * 100;
-                            const label = context.chart.data.labels[context.dataIndex];
-                            return `${label}\n${percent.toFixed(1)}%`;
-                        },
+                        formatter: (value, context) => this.formatLabel(value, context),
                         anchor: 'center',
                         align: 'center',
-                        textAlign: 'center'
+                        textAlign: 'center',
+                        rotation: (context) => this.getCategoryRotation(context)
                     },
                     tooltip: { enabled: false },
                     legend: { display: false }
@@ -120,6 +116,28 @@ class CategoryDiagram {
         return colors;
     }
 
+    getCategoryRotation(context) {
+        const category = context.chart.data.labels[context.dataIndex];
+        switch (category) {
+            case 'Nebenkosten':
+                return -25;
+            case 'Sonstiges':
+                return -10;
+            default:
+                return 0;
+        }
+    }
+
+    formatLabel(value, context) {
+        const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+        const percent = (value / total) * 100;
+        const label = context.chart.data.labels[context.dataIndex];
+    
+        return label === 'Katzen' 
+            ? `${label} ${percent.toFixed(1).replace('.', ',')}%` 
+            : `${label}\n${percent.toFixed(1).replace('.', ',')}%`;
+    }
+
     updateCategoriesData(categories) {
         this.categories = categories;
     }
@@ -137,7 +155,6 @@ class CategoryDiagram {
         chart.data.datasets[0].backgroundColor = this.generateCategoryColors(Object.keys(data).length);
         chart.data.datasets[0].data = Object.values(data);
         chart.update();
-        
     }
 }
 
