@@ -12,11 +12,10 @@ class Diagram {
         this.detailView = new DetailView(transactionModal);
         this.categories = { income: [], expense: [] }; 
         this.monthOffset = 0;
-
         this.nextButton = document.getElementById('nextMonth');
         this.prevButton = document.getElementById('prevMonth');
-        this.nextButton.style.visibility = 'hidden';
-        this.prevButton.style.visibility = 'visible';
+        this.nextButton.style.display = 'none';
+        this.prevButton.style.display = 'flex';
     }
 
     createChart(canvasId, incomeList, expenseList) {
@@ -34,12 +33,14 @@ class Diagram {
                     {
                         label: 'Einnahmen',
                         data: incomeData.amounts,
-                        backgroundColor: turquise
+                        backgroundColor: turquise,
+                        hoverBackgroundColor: '#00ffcc'
                     },
                     {
                         label: 'Ausgaben',
                         data: expenseData.amounts,
-                        backgroundColor: purple
+                        backgroundColor: purple,
+                        hoverBackgroundColor: '#ff00aa'
                     }
                 ]
             },
@@ -116,9 +117,9 @@ class Diagram {
         const months = this.getRollingMonths(this.monthOffset);
         const firstDisplayedMonth = months[0];
         const formattedEarliestDate = `${earliestDate.toLocaleString('de-DE', { month: 'short' })}'${earliestDate.getFullYear().toString().slice(-2)}`;
+        this.prevButton.style.display = (firstDisplayedMonth === formattedEarliestDate) ? 'none' : 'flex';
+        this.nextButton.style.display = (this.monthOffset === 0) ? 'none' : 'flex';
         this.updateChartData(incomeList, expenseList);
-        this.prevButton.style.display = (firstDisplayedMonth === formattedEarliestDate) ? 'none' : 'block';
-        this.nextButton.style.visibility = (this.monthOffset === 0) ? 'hidden' : 'visible';
     }
     
     nextMonth(incomeList, expenseList) {
@@ -128,8 +129,8 @@ class Diagram {
             const months = this.getRollingMonths(this.monthOffset);
             const firstDisplayedMonth = months[0];
             const formattedEarliestDate = `${earliestDate.toLocaleString('de-DE', { month: 'short' })}'${earliestDate.getFullYear().toString().slice(-2)}`;
-            this.prevButton.style.display = (firstDisplayedMonth === formattedEarliestDate) ? 'none' : 'block';
-            this.nextButton.style.visibility = (this.monthOffset === 0) ? 'hidden' : 'visible';
+            this.prevButton.style.display = (firstDisplayedMonth === formattedEarliestDate) ? 'none' : 'flex';
+            this.nextButton.style.display = (this.monthOffset === 0) ? 'none' : 'flex';
             this.updateChartData(incomeList, expenseList);
         }
     }
@@ -204,12 +205,6 @@ class Diagram {
     }
 
     prepareChartData(list) {
-       /*  const allMonths = [
-            "Jan'24", "Feb'24", "Mär'24", "Apr'24", "Mai'24", "Jun'24",
-            "Jul'24", "Aug'24", "Sep'24", "Okt'24", "Nov'24", "Dez'24",
-            "Jan'25", "Feb'25", "Mär'25", "Apr'25"
-        ]; */
-
         const allMonths = this.getRollingMonths(this.monthOffset);
 
         const data = allMonths.reduce((acc, month) => {
@@ -217,7 +212,7 @@ class Diagram {
             return acc;
         }, {});
 
-        list.forEach(({ category, amount, date }) => {
+        list.forEach(({ amount, date }) => {
             const transactionDate = new Date(date);
             const monthYear = `${transactionDate.toLocaleString('de-DE', { month: 'short' })}'${transactionDate.getFullYear().toString().slice(-2)}`;
             if (data[monthYear] !== undefined) {

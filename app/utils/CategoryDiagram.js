@@ -2,21 +2,21 @@ const { Chart, PieController, ArcElement, Title, Tooltip } = require('chart.js')
 Chart.register(PieController, ArcElement, Title, Tooltip);
 const ChartDataLabels = require('chartjs-plugin-datalabels');
 Chart.register(ChartDataLabels);
-
+const CategoryDetailDiagram = require('../utils/CategoryDetailDiagram');
+const categoryDetailDiagram = new CategoryDetailDiagram();
 const fontColor = getComputedStyle(document.documentElement).getPropertyValue('--fontColor').trim();
 
 class CategoryDiagram {
     constructor() {
         this.incomeChart = null;
         this.expenseChart = null;
-
+        this.selctedCategory = null;
         this.incomePalette = [
             '#57b2be', '#4a90e2', '#6ec1e4', '#007acc', '#2d9cdb',
             '#00b8d9', '#009688', '#1abc9c', '#3faffa', '#5dade2',
             '#2980b9', '#48c9b0', '#3498db', '#00a8cc', '#4dd0e1',
             '#00acc1', '#26c6da', '#00838f', '#006064', '#80deea'
         ];
-
         this.expensePalette = [
             '#d00f7c', '#e74c3c', '#c0392b', '#f06292', '#ab47bc',
             '#9c27b0', '#e91e63', '#880e4f', '#ad1457', '#d81b60',
@@ -55,6 +55,7 @@ class CategoryDiagram {
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
+                onClick: (event, elements) => this.handleChartClick(event, elements, labels),
                 plugins: {
                     datalabels: {
                         color: fontColor,
@@ -155,6 +156,25 @@ class CategoryDiagram {
         chart.data.datasets[0].backgroundColor = this.generateCategoryColors(Object.keys(data).length);
         chart.data.datasets[0].data = Object.values(data);
         chart.update();
+    }
+
+    handleChartClick(event, elements, labels) {
+        if (elements.length > 0) {
+            const clickedIndex = elements[0].index;
+            const clickedLabel = labels[clickedIndex];
+            const chart = elements[0].element.$context.chart;
+            const backgroundColor = chart.data.datasets[0].backgroundColor[clickedIndex];
+
+            const categoryMap = {
+                'Versicherung': ['Hausrat', 'Allianz'],
+                'Sonstiges': ['Apple', 'Steuern', 'Kreditkartengebühr'],
+                'Nebenkosten': ['Strom', 'Wasser'],
+                'Katzen': ['Katzenbedarf']
+            };
+
+            const originalCategories = categoryMap[clickedLabel] || [clickedLabel];
+            categoryDetailDiagram.showDetail(originalCategories, backgroundColor);
+        }
     }
 }
 

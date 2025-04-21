@@ -76,6 +76,7 @@ body {
     padding: 10px;
     box-sizing: border-box;
     cursor: default;
+    user-select: none;
 }
 
 .left {
@@ -920,7 +921,8 @@ td:last-child {
     position: relative;
 }
 
-.diagram-container button {
+.diagram-container button/* ,
+#category-detail-diagram button  */ {
     border: none;
     background-color: transparent;
     position: absolute;
@@ -928,22 +930,26 @@ td:last-child {
     align-items: center;
 }
 
-.diagram-container button img {
+.diagram-container button img/* ,
+#category-detail-diagram button img  */{
     width: 25px;
     object-fit: contain;
     transition: transform 0.2s ease-in-out;
     cursor: pointer;
 }
 
-.diagram-container button img:hover {
+.diagram-container button img:hover/* ,
+#category-detail-diagram button img:hover  */{
     transform: scale(1.2);
 }
 
-#prevMonth {
+#prevMonth/* ,
+#prevMonthCategory */ {
     left: -5px;
 }
 
-#nextMonth {
+#nextMonth/* ,
+#nextMonthCategory  */{
     right: -5px;
 }
 
@@ -954,6 +960,30 @@ td:last-child {
     align-items: center;
     justify-content: space-around;
 }
+
+#category-detail-diagram {
+    display: none;
+   /*  flex-direction: column; */
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+#backButton {
+    position: absolute;
+    left: 10px;
+    top: 0;
+    font-size: 25px;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+#backButton:hover {
+    transform: scale(1.1);
+}
+
 
 .right {
     flex-grow: 0;
