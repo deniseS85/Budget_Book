@@ -27,7 +27,7 @@ const categoryDiagram = new CategoryDiagram(transactionModal);
 const detailView = new DetailView(transactionModal);
 
 transactionModal.setDiagramInstance(diagram); 
-transactionModal.setCategoryDiagramInstanse(categoryDiagram);
+transactionModal.setCategoryDiagramInstance(categoryDiagram);
 
 document.getElementById('income-box').addEventListener('click', () => detailView.openDetailView('income'));
 document.getElementById('expenses-box').addEventListener('click', () => detailView.openDetailView('expense'));

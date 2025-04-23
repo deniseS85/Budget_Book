@@ -65,7 +65,7 @@ class TransactionModal {
         this.diagram = diagram;
     }
 
-    setCategoryDiagramInstanse(categoryDiagram) {
+    setCategoryDiagramInstance(categoryDiagram) {
         this.categoryDiagram = categoryDiagram;
     }
 

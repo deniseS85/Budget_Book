@@ -990,7 +990,7 @@ td:last-child {
     flex-basis: 300px;
 
 
-   /*  display: none; */
+    display: none;
 }
 
 .payment-method-container {

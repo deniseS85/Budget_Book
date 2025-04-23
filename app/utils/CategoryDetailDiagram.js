@@ -158,6 +158,11 @@ class CategoryDetailDiagram {
         const allTransactions = [...incomeList, ...expenseList];
         return allTransactions.filter(transaction => categories.includes(transaction.category));
     }
+
+    updateChartData(categories, backgroundColor) {
+        const categoryData = this.getCategoryDataFromCategories(categories);
+        this.createCategoryChart(categoryData, backgroundColor);
+    }
 }
 
 module.exports = CategoryDetailDiagram;

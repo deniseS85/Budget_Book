@@ -10,7 +10,8 @@ class CategoryDiagram {
     constructor() {
         this.incomeChart = null;
         this.expenseChart = null;
-        this.selctedCategory = null;
+        this.selectedCategory = null;
+        this.selectedColor = null;
         this.incomePalette = [
             '#57b2be', '#4a90e2', '#6ec1e4', '#007acc', '#2d9cdb',
             '#00b8d9', '#009688', '#1abc9c', '#3faffa', '#5dade2',
@@ -55,7 +56,7 @@ class CategoryDiagram {
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
-                onClick: (event, elements) => this.handleChartClick(event, elements, labels),
+                onClick: (event, elements) => this.handleChartClick(event, elements),
                 plugins: {
                     datalabels: {
                         color: fontColor,
@@ -144,25 +145,29 @@ class CategoryDiagram {
     }
     
     updateChartData(incomeList, expenseList) {
-        this.renderChartData(this.incomeChart, incomeList);
-        this.renderChartData(this.expenseChart, expenseList);
+        if (document.getElementById('category-detail-diagram').style.display === 'flex') {
+            categoryDetailDiagram.updateChartData(this.selectedCategory, this.selectedColor);
+        } 
+        this.renderChartData(this.incomeChart, incomeList, 'income');
+        this.renderChartData(this.expenseChart, expenseList, 'expense');
     }
 
-    renderChartData(chart, list) {
-        if (!this.chart) return;
-
+    renderChartData(chart, list, chartType) {
+        if (!chart) return;
         const data = this.getCategoryData(list);
-        chart.data.labels = Object.keys(data);
-        chart.data.datasets[0].backgroundColor = this.generateCategoryColors(Object.keys(data).length);
-        chart.data.datasets[0].data = Object.values(data);
+        const sortedLabels = Object.keys(data).sort();
+        chart.data.labels = sortedLabels;
+        chart.data.datasets[0].backgroundColor = this.generateCategoryColors(sortedLabels.length, chartType);
+        chart.data.datasets[0].data = sortedLabels.map(label => data[label]);
         chart.update();
     }
 
-    handleChartClick(event, elements, labels) {
+    handleChartClick(event, elements) {
         if (elements.length > 0) {
             const clickedIndex = elements[0].index;
-            const clickedLabel = labels[clickedIndex];
             const chart = elements[0].element.$context.chart;
+            const labels = chart.data.labels;
+            const clickedLabel = labels[clickedIndex];
             const backgroundColor = chart.data.datasets[0].backgroundColor[clickedIndex];
 
             const categoryMap = {
@@ -173,6 +178,9 @@ class CategoryDiagram {
             };
 
             const originalCategories = categoryMap[clickedLabel] || [clickedLabel];
+            this.selectedCategory = originalCategories;
+            this.selectedColor = backgroundColor;
+
             categoryDetailDiagram.showDetail(originalCategories, backgroundColor);
         }
     }
